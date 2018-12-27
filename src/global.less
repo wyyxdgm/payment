@@ -1,5 +1,7 @@
+@import '~antd-mobile/es/style/mixins/hairline';
+
 html {
-  font-size: 10vw
+  font-size: 10vw;
 }
 
 html,
@@ -40,7 +42,37 @@ ol {
   font-size: 16px !important;
 }
 
+.am-list-body {
+  .am-list-item:not(:last-child), >div:not(:last-child) {
+    position: relative;
+    .hairline('bottom');
+  }
+  >div:not([class]) {
+    margin: 0 15px;
+    .am-list-item {
+      margin: unset;
+    }
+  }
+}
+
+// 让picker的extra左对齐
 .am-list-extra {
   flex-basis: unset !important;
 }
 
+.am-list-item,
+.am-list-item.am-input-item {
+  padding-left: unset !important;
+  margin: 0 15px;
+}
+
+.am-list-line {
+  border-bottom: none !important;
+  padding-right: unset !important;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+  html:not([data-scale]) .am-list-body div:not(:last-child) .am-list-line:after {
+    height: unset !important;
+  }
+}
