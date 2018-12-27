@@ -3,6 +3,7 @@ import request from '@/utils/request';
 
 export async function submit(payload) {
   return request('/ajax/pay/pay/payment', {
+    headers: { Accept: 'text/html' },
     method: 'POST',
     body: payload,
   });
@@ -17,9 +18,17 @@ export async function cascade(payload) {
 }
 
 export async function openId(payload) {
-  return request('/ajax/pay/wechatPay/getOpenId', { method: 'POST', body: payload });
+  return request('/ajax/pay/wechatPay/getOpenId', {
+    headers: { Accept: 'text/html' },
+    method: 'POST',
+    body: payload,
+  });
 }
 
 export async function getFormInfo(payload) {
-  return request('/ajax/pay/wechatPay/dopay', { method: 'POST', body: payload });
+  return request('/ajax/pay/wechatPay/dopay', {
+    headers: { Accept: 'text/html' },
+    method: 'POST',
+    body: payload,
+  });
 }

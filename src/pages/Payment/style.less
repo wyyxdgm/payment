@@ -7,7 +7,7 @@
 }
 
 .container {
-  padding: 4rem 20px 0;
+  padding: 4rem 15px 0;
   background: url(../../assets/paymentBg.png) no-repeat;
   background-size: 100%;
 
@@ -31,7 +31,7 @@
     }
 
     .am-button {
-      background: linear-gradient(-90deg, rgba(255, 218, 137, 1), rgba(255, 178, 29, 1));
+      background: linear-gradient(-90deg, rgba(255, 178, 29, 1), rgba(255, 218, 137, 1));
       box-shadow: 1px 12px 24px 0 rgba(255, 206, 115, 0.5);
       border-radius: 30px !important;
 
@@ -43,6 +43,10 @@
         border-width: 0 !important;
       }
     }
+
+    .am-input-control input {
+      font-size: 15px;
+    }
   }
 }
 
@@ -50,15 +54,17 @@
   :global {
     .am-list-content {
       color: #ccc !important;
+      font-size: 15px !important;
     }
   }
 }
 
 .card {
+  margin-bottom: 0;
   padding: 0 20px;
   border-radius: 10px;
   background-color: #fff;
-  font-size: 17px;
+  font-size: 14px;
 
   dt {
     padding-top: 20px;
@@ -77,6 +83,7 @@
   dd {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin: 15px 0;
     color: #999;
 
@@ -85,11 +92,13 @@
       padding: 10px 20px;
       border-radius: 0 0 10px 10px;
       color: #171717;
+      font-size: 15px;
       background-color: #fafafa;
     }
 
     small {
       color: #666;
+      font-size: 12px;
     }
 
     .rate {
@@ -100,7 +109,11 @@
 }
 
 .btnArea {
-  margin: 0 -20px;
+  margin: 0 -15px;
   padding: 20px;
   background-color: #fff;
+}
+
+.btnPrice {
+  font-size: 20px;
 }

@@ -118,6 +118,7 @@ export default function request(url, option) {
       sessionStorage.removeItem(`${hashcode}:timestamp`);
     }
   }
+
   return fetch(url, newOptions)
     .then(checkStatus)
     .then(response => cachedSave(response, hashcode))
@@ -127,7 +128,8 @@ export default function request(url, option) {
       if (
         newOptions.method === 'DELETE' ||
         response.status === 204 ||
-        /text\/html/.test(response.headers.get('content-type'))
+        /text\/html/.test(response.headers.get('content-type')) ||
+        (newOptions.headers && /text\/html/.test(newOptions.headers.Accept))
       ) {
         return response.text();
       }

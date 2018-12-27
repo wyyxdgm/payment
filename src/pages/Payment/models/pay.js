@@ -1,5 +1,6 @@
 import mapKeys from 'lodash/mapKeys';
 import find from 'lodash/find';
+import qs from 'qs';
 import { submit, detail, cascade, openId, getFormInfo } from '@/services/pay';
 import { jsonToFormData } from '@/utils/convert';
 
@@ -70,16 +71,18 @@ export default {
     },
 
     *openId({payload, callback}, {call}){
-      const response = yield call(openId, {...payload});
+      const formData = jsonToFormData({...payload, kindergartenId: 0});
+      const response = yield call(openId, formData);
       if (callback) {
         callback(response);
       }
     },
 
     *getFormInfo({payload, callback}, {call}){
-      const response = yield call(getFormInfo, {...payload});
+      const formData = jsonToFormData(payload);
+      const response = yield call(getFormInfo, formData);
       if (callback) {
-        callback(response);
+        callback(qs.parse(response));
       }
     },
 

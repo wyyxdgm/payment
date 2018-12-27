@@ -4,18 +4,11 @@ export default [
     path: '/',
     component: '../layouts/BlankLayout',
     routes: [
-      {path: '/', redirect: '/payment'},
-      {path: '/payment', component: './Payment'},
+      { path: '/', redirect: '/payment' },
+      { path: '/payment', component: './Payment' },
       {
         path: '/result',
-        routes: [
-          // result
-          {
-            path: '/result/success',
-            component: './Result/Success',
-          },
-          { path: '/result/fail', component: './Result/Error' },
-        ],
+        component: './Result/',
       },
       {
         name: 'exception',

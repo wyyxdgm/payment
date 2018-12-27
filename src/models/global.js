@@ -10,12 +10,12 @@ export default {
 
   effects: {
     *result({ payload }, { put }) {
-      yield put({ type: 'result', payload });
+      yield put({ type: 'resultComplete', payload });
     },
   },
 
   reducers: {
-    result(state, action) {
+    resultComplete(state, action) {
       return { ...state, result: action.payload };
     },
   },
