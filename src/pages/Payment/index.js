@@ -211,6 +211,7 @@ class Payment extends PureComponent {
           <InputItem
             placeholder="请输入学生姓名"
             labelNumber={2}
+            maxLength="20"
             error={getFieldError('studentName')}
             {...getFieldProps('studentName', {
               rules: [{ required: true, message: '请输入学生姓名' }],
@@ -221,6 +222,7 @@ class Payment extends PureComponent {
           <InputItem
             placeholder="请输入缴费人姓名"
             labelNumber={2}
+            maxLength="20"
             error={getFieldError('payName')}
             {...getFieldProps('payName', {
               rules: [{ required: true, message: '请输入缴费人姓名' }],
