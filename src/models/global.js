@@ -3,7 +3,7 @@ export default {
 
   state: {
     result: {
-      status: 'ok',
+      status: 'fail',
       message: '',
     },
   },

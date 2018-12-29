@@ -44,6 +44,7 @@ class Payment extends PureComponent {
     } = this.props;
 
     const { formId, code } = query;
+    // 微信客户端访问，如果没有得到code就跳微信转授权页面，微信会自动重定向携带code
     if (!code && isWeChat()) {
       const payload = {
         appid: 'wx978d1cc596ecc4db',
@@ -59,6 +60,7 @@ class Payment extends PureComponent {
       dispatch({ type: 'pay/detail', payload: { id: formId } });
       dispatch({ type: 'pay/cascade', payload: { formId } });
       if (isWeChat()) {
+        // 通过得到的code取openid
         dispatch({
           type: 'pay/openId',
           payload: { code },

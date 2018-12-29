@@ -4,11 +4,16 @@ export default [
     path: '/',
     component: '../layouts/BlankLayout',
     routes: [
-      { path: '/', redirect: '/payment' },
       { path: '/payment', component: './Payment' },
+      { path: '/tuition', component: './Tuition' },
       {
         path: '/result',
-        component: './Result/',
+        routes: [
+          { path: '/result', redirect: '/result/pay-success' },
+          { path: '/result/pay-success', component: './Result/PaySuccess' },
+          { path: '/result/pay-cancel', component: './Result/PayCancel' },
+          { path: '/result/pay-fail', component: './Result/PayFail' },
+        ],
       },
       {
         name: 'exception',
