@@ -1,0 +1,145 @@
+@import '~swiper/dist/css/swiper.css';
+@import '~antd-mobile/es/style/mixins/hairline';
+
+.container {
+  padding: 4rem 15px 0;
+  background: url(../../assets/tuitionBg.png) no-repeat;
+  background-size: 100%;
+
+  :global {
+    .am-list-body {
+      border-radius: 10px;
+      &:before {
+        background-color: unset !important;
+      }
+      &:after {
+        background-color: unset !important;
+      }
+    }
+    .am-list-item {
+      min-height: 60px;
+      background-color: unset;
+    }
+
+    .am-radio-inner {
+      top: 23px !important;
+    }
+
+    .am-button {
+      background: #3183FA;
+      border-radius: 30px !important;
+      color: #fff;
+
+      &:before {
+        border-width: 0 !important;
+      }
+    }
+
+    .am-input-control input {
+      font-size: 15px;
+    }
+  }
+}
+
+.student {
+  display: flex;
+  align-items: center;
+  margin: 0 15px;
+  > div {
+    flex: 1;
+    margin: 0 -15px !important;
+  }
+  > a {
+    padding: 5px;
+    color: #ed775a;
+  }
+  :global {
+    .am-list-content {
+      color: #ccc !important;
+      font-size: 15px !important;
+    }
+  }
+}
+
+.card() {
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.title {
+  .card;
+  padding: 20px 15px;
+  font-size: 17px;
+  text-align: center;
+}
+
+.staging {
+  .card;
+  padding: 20px;
+
+  dl {
+    margin-bottom: unset;
+    border: 1px solid #e4e4e4;
+    border-radius: 5px;
+    background-color: #fff;
+  }
+  dt {
+    background-color: #e4e4e4;
+    font-size: 12px;
+    color: #fff;
+    text-align: center;
+    font-weight: normal;
+    line-height: 20px;
+  }
+  dd {
+    text-align: center;
+    margin-bottom: unset;
+    padding: 10px 5px;
+    color: #d7d7d7;
+
+    p {
+      margin-bottom: 0;
+      font-size: 12px;
+      &:last-child {
+        font-size: 18px;
+      }
+    }
+    del {
+      font-size: 12px;
+    }
+    small {
+      font-size: 70%;
+    }
+  }
+
+  .checked {
+    border-color: #ed775a !important;
+    box-shadow: #ed775a;
+    dt {
+      background-color: #ed775a;
+      border-radius: 5px 5px 0 0;
+    }
+    p {
+      color: #171717;
+      &:last-child {
+        color: #ed775a;
+      }
+    }
+  }
+
+  // 支付方式标题
+  > p {
+    position: relative;
+    margin: 0;
+    padding: 20px 0 10px;
+  }
+  .payList {
+    margin: 0 -20px -20px;
+  }
+}
+
+.btnArea {
+  margin: 0 -15px;
+  padding: 20px;
+  background-color: #fff;
+}

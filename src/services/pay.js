@@ -17,6 +17,10 @@ export async function cascade(payload) {
   return request(`/ajax/grade/GradeClass/getGradeAndClassByFormId?${qs.stringify(payload)}`);
 }
 
+export async function student(payload) {
+  return request(`/ajax/people/Student/query?${qs.stringify(payload)}`);
+}
+
 export async function openId(payload) {
   return request('/ajax/pay/wechatPay/getOpenId', {
     headers: { Accept: 'text/html' },
