@@ -42,6 +42,13 @@ class Payment extends PureComponent {
     } = this.props;
 
     const { formId, code, classId } = query;
+    localStorage.setItem('id', query.formId);
+    if (formId) {
+      dispatch({ type: 'tuition/detail', payload: { id: formId } });
+    }
+    if (classId) {
+      dispatch({ type: 'tuition/student', payload: { classId } });
+    }
     // 微信客户端访问，如果没有得到code就跳微信转授权页面，微信会自动重定向携带code
     if (!code && isWeChat()) {
       const payload = {
@@ -55,22 +62,14 @@ class Payment extends PureComponent {
         payload
       )}#wechat_redirect`;
     } else {
-      if (formId) {
-        dispatch({ type: 'tuition/detail', payload: { id: formId } });
-      }
-      if (classId) {
-        dispatch({ type: 'tuition/student', payload: { classId } });
-      }
-      if (isWeChat()) {
-        // 通过得到的code取openid
-        dispatch({
-          type: 'tuition/openId',
-          payload: { code },
-          callback: responseData => {
-            this.openId = responseData;
-          },
-        });
-      }
+      // 通过得到的code取openid
+      dispatch({
+        type: 'tuition/openId',
+        payload: { code },
+        callback: responseData => {
+          this.openId = responseData;
+        },
+      });
     }
   }
 
