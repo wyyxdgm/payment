@@ -1,4 +1,5 @@
 import qs from 'qs';
+import findIndex from 'lodash/findIndex';
 import { submit, detail, student, openId, getFormInfo } from '@/services/pay';
 import { jsonToFormData } from '@/utils/convert';
 
@@ -61,6 +62,11 @@ export default {
       const { data, types } = action.payload;
       const { name } = data;
       types.sort((a, b) => b.type - a.type);
+      // 把6月分期放到最前面
+      const index = findIndex(types, { installmentType: 3, type: 2 });
+      if (index > 0) {
+        types.unshift(...types.splice(index, 1));
+      }
 
       return { ...state, summary: { name }, staging: [...types] };
     },

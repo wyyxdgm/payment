@@ -108,7 +108,7 @@ class Payment extends PureComponent {
         payType,
         studentName: '',
         ...values,
-        studentId: values.studentId && values.studentId[0],
+        studentId: values.studentId ? values.studentId[0] : 0,
         typeId: this.typeId,
         className: query.className,
         payPhone: values.payPhone.replace(/\s/g, ''),
@@ -125,7 +125,7 @@ class Payment extends PureComponent {
               document.body.innerHTML = responseData;
               document.forms[0].submit();
             } else if (payType === 2) {
-              this.getWeChatParam(responseData, values.typeId);
+              this.getWeChatParam(responseData, this.typeId);
             }
           },
         });
@@ -174,11 +174,11 @@ class Payment extends PureComponent {
         switch (res.err_msg) {
           case 'get_brand_wcpay_request:cancel':
             dispatch({ type: 'global/result', payload: { status: 'cancel', message: '' } });
-            router.replace('/result/');
+            router.replace('/mform/result/result/pay-cancel');
             break;
           case 'get_brand_wcpay_request:fail':
             dispatch({ type: 'global/result', payload: { status: 'fail', message: '' } });
-            router.replace('/result/');
+            router.replace('/mform/result/result/pay-fail');
             break;
           case 'get_brand_wcpay_request:ok':
             window.location.href = 'http://m.hoogoo.cn/PaySuccess';
@@ -194,13 +194,14 @@ class Payment extends PureComponent {
       staging,
       students,
       submitting,
+      location: { query },
     } = this.props;
     const { payType, studentInputWay } = this.state;
     const { name } = summary;
 
     return (
       <div className={styles.container}>
-        <div className={styles.title}>{name}</div>
+        <div className={styles.title}>{`${name} - ${query.className}`}</div>
         <WhiteSpace size="lg" />
         学生信息
         <WhiteSpace size="lg" />
