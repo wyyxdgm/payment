@@ -41,7 +41,7 @@ class Payment extends PureComponent {
       dispatch,
     } = this.props;
 
-    const { formId, code, classId } = query;
+    const { formId, code, classId, kindergartenId } = query;
     localStorage.setItem('id', query.formId);
     if (formId) {
       dispatch({ type: 'tuition/detail', payload: { id: formId } });
@@ -50,32 +50,44 @@ class Payment extends PureComponent {
       dispatch({ type: 'tuition/student', payload: { classId } });
     }
     // 微信客户端访问，如果没有得到code就跳微信转授权页面，微信会自动重定向携带code
-    if (!code && isWeChat()) {
-      const payload = {
-        appid: 'wx978d1cc596ecc4db',
-        redirect_uri: window.location.href,
-        response_type: 'code',
-        scope: 'snsapi_base',
-        state: 'STATE',
-      };
-      window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?${qs.stringify(
-        payload
-      )}#wechat_redirect`;
-    } else {
-      // 通过得到的code取openid
-      dispatch({
-        type: 'tuition/openId',
-        payload: { code },
-        callback: responseData => {
-          this.openId = responseData;
-        },
-      });
+    if (isWeChat()) {
+      if (!code) {
+        dispatch({
+          type: 'tuition/appId',
+          payload: { kindergartenId },
+          callback: content => {
+            const { weChatAPPID } = JSON.parse(content);
+            const payload = {
+              appid: weChatAPPID,
+              redirect_uri: window.location.href,
+              response_type: 'code',
+              scope: 'snsapi_base',
+              state: 'STATE',
+            };
+            window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?${qs.stringify(
+              payload
+            )}#wechat_redirect`;
+          },
+        });
+      } else {
+        // 通过得到的code取openid
+        dispatch({
+          type: 'tuition/openId',
+          payload: { code, kindergartenId },
+          callback: responseData => {
+            this.openId = responseData;
+          },
+        });
+      }
     }
   }
 
   // 得到所有支付参数
   getWeChatParam(orderNo, typeId) {
-    const { dispatch } = this.props;
+    const {
+      dispatch,
+      location: { query },
+    } = this.props;
 
     dispatch({
       type: 'tuition/getFormInfo',
@@ -83,7 +95,7 @@ class Payment extends PureComponent {
         orderNo,
         typeId,
         openid: this.openId,
-        kindergartenId: 0,
+        kindergartenId: query.kindergartenId,
       },
       callback: data => this.revokeWeChat(data),
     });
@@ -114,7 +126,9 @@ class Payment extends PureComponent {
       };
 
       if (payType === 5) {
-        window.location.href = `http://m.hoogoo.cn/ajax/pay/pay/payment?${qs.stringify(payload)}`;
+        window.location.href = `http://m.hoogoo.cn/ajax/pay/pay/payment?${qs.stringify(
+          payload
+        )}`;
       } else {
         dispatch({
           type: 'tuition/submit',
@@ -173,11 +187,11 @@ class Payment extends PureComponent {
         switch (res.err_msg) {
           case 'get_brand_wcpay_request:cancel':
             dispatch({ type: 'global/result', payload: { status: 'cancel', message: '' } });
-            router.replace('/mform/result/result/pay-cancel');
+            router.replace('/result/pay-cancel');
             break;
           case 'get_brand_wcpay_request:fail':
             dispatch({ type: 'global/result', payload: { status: 'fail', message: '' } });
-            router.replace('/mform/result/result/pay-fail');
+            router.replace('/result/pay-fail');
             break;
           case 'get_brand_wcpay_request:ok':
             window.location.href = 'http://m.hoogoo.cn/PaySuccess';

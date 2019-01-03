@@ -1,6 +1,6 @@
 import qs from 'qs';
 import findIndex from 'lodash/findIndex';
-import { submit, detail, student, openId, getFormInfo } from '@/services/pay';
+import { submit, detail, student, appId, openId, getFormInfo } from '@/services/pay';
 import { jsonToFormData } from '@/utils/convert';
 
 export default {
@@ -24,8 +24,17 @@ export default {
       }
     },
 
+    *appId({ payload, callback }, { call }) {
+      const response = yield call(appId, {...payload, type: 2});
+      if (response.code === 0) {
+        if (callback) {
+          callback(response.data.content);
+        }
+      }
+    },
+
     *openId({ payload, callback }, { call }) {
-      const formData = jsonToFormData({ ...payload, kindergartenId: 0 });
+      const formData = jsonToFormData({ ...payload });
       const response = yield call(openId, formData);
       if (callback) {
         callback(response);
