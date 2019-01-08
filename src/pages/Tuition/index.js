@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { List, InputItem, Radio, WhiteSpace, Picker, Button, Toast } from 'antd-mobile';
+import { List, InputItem, Radio, WhiteSpace, Picker, Button, Toast, Icon } from 'antd-mobile';
 import { createForm } from 'rc-form';
 import qs from 'qs';
 import router from 'umi/router';
+import Loading from '@/components/PageLoading';
 import { isWeChat } from '@/utils/userAgent';
 import Staging from './Staging';
 import { ReactComponent as Student } from '@/assets/icon/xuesheng.svg';
@@ -19,9 +20,10 @@ import styles from './style.less';
   staging: tuition.staging,
   students: tuition.students,
   submitting: loading.effects['tuition/submit'],
+  detailLoading: loading.effects['tuition/detail'],
 }))
 @createForm()
-class Payment extends PureComponent {
+class Tuition extends PureComponent {
   openId = '';
 
   constructor(props) {
@@ -56,6 +58,9 @@ class Payment extends PureComponent {
           type: 'tuition/appId',
           payload: { kindergartenId },
           callback: content => {
+            if (!content) {
+              return;
+            }
             const { weChatAPPID } = JSON.parse(content);
             const payload = {
               appid: weChatAPPID,
@@ -89,6 +94,10 @@ class Payment extends PureComponent {
       location: { query },
     } = this.props;
 
+    if (!this.openId) {
+      alert('当前园所不支持微信支付');
+      return;
+    }
     dispatch({
       type: 'tuition/getFormInfo',
       payload: {
@@ -126,9 +135,7 @@ class Payment extends PureComponent {
       };
 
       if (payType === 5) {
-        window.location.href = `http://m.hoogoo.cn/ajax/pay/pay/payment?${qs.stringify(
-          payload
-        )}`;
+        window.location.href = `https://m.hoogoo.cn/ajax/pay/pay/payment?${qs.stringify(payload)}`;
       } else {
         dispatch({
           type: 'tuition/submit',
@@ -194,13 +201,13 @@ class Payment extends PureComponent {
             router.replace('/result/pay-fail');
             break;
           case 'get_brand_wcpay_request:ok':
-            window.location.href = 'http://m.hoogoo.cn/PaySuccess';
+            window.location.href = 'https://m.hoogoo.cn/PaySuccess';
         }
       }
     );
   }
 
-  render() {
+  normal() {
     const {
       form: { getFieldProps, getFieldError },
       summary,
@@ -235,6 +242,11 @@ class Payment extends PureComponent {
                   error={getFieldError('studentId')}
                 />
               </Picker>
+              <Icon
+                type="right"
+                color="#a0a0a0"
+                style={{ position: 'absolute', right: '2.5rem' }}
+              />
               <a onClick={this.handleStudentInputWay('input')}>添加新生</a>
             </div>
           )}
@@ -287,7 +299,6 @@ class Payment extends PureComponent {
         <WhiteSpace size="lg" />
         <div className={styles.staging}>
           <Staging data={staging} onChange={this.handleStagingChange} />
-          {payType <= 2 ? <p>请选择支付方式</p> : <p />}
           <List className={styles.payList}>
             {!isWeChat() && payType <= 2 && (
               <Radio.RadioItem
@@ -318,6 +329,12 @@ class Payment extends PureComponent {
       </div>
     );
   }
+
+  render() {
+    const { detailLoading } = this.props;
+    return detailLoading === undefined || detailLoading ? <Loading /> : this.normal();
+    // return this.normal();
+  }
 }
 
-export default Payment;
+export default Tuition;

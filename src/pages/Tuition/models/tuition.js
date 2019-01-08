@@ -25,10 +25,11 @@ export default {
     },
 
     *appId({ payload, callback }, { call }) {
-      const response = yield call(appId, {...payload, type: 2});
+      const response = yield call(appId, { ...payload, type: 2 });
       if (response.code === 0) {
         if (callback) {
-          callback(response.data.content);
+          const content = response.data ? response.data.content : '';
+          callback(content);
         }
       }
     },
@@ -71,11 +72,6 @@ export default {
       const { data, types } = action.payload;
       const { name } = data;
       types.sort((a, b) => b.type - a.type);
-      // 把6月分期放到最前面
-      const index = findIndex(types, { installmentType: 3, type: 2 });
-      if (index > 0) {
-        types.unshift(...types.splice(index, 1));
-      }
 
       return { ...state, summary: { name }, staging: [...types] };
     },

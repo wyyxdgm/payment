@@ -3,19 +3,78 @@ function payment(req, res) {
 }
 
 function detail(req, res) {
-  res.send({
-    code: 0,
-    data: {
-      name: '阳光雨露幼儿园学费1年分期首付款预交',
-      formContent:
-        '111餐饮费:￥3400.00元/学生·月\n' +
-        '餐饮费:￥3400.00元/学生·月\n' +
-        '餐饮费:￥3400.00元/学生·月',
-      feeTotal: 19000,
-      firstAmount: 5999,
-    },
-    types: [{id:1}, 2, 3],
-  });
+  setTimeout(() => {
+    res.send({
+      types: [
+        {
+          id: 4324841822093592,
+          formId: 4324841822093439,
+          name: '',
+          amount: 6000.0,
+          type: 2,
+          installmentType: 1,
+          preferentialPolicy: '',
+          monthAmount: 500.0,
+        },
+        {
+          id: 4324841822093593,
+          formId: 4324841822093439,
+          name: '',
+          amount: 11000.0,
+          type: 2,
+          installmentType: 2,
+          preferentialPolicy: '',
+          monthAmount: 458.33,
+        },
+        {
+          id: 4324841822093596,
+          formId: 4324841822093439,
+          name: '',
+          amount: 3100.0,
+          type: 2,
+          installmentType: 3,
+          preferentialPolicy: '',
+          monthAmount: 516.67,
+        },
+        {
+          id: 4324841822093565,
+          formId: 4324841822093439,
+          name: '',
+          amount: 3100.0,
+          type: 2,
+          installmentType: 3,
+          preferentialPolicy: '',
+          monthAmount: 516.67,
+        },
+        {
+          id: 4324841822093597,
+          formId: 4324841822093439,
+          name: '',
+          amount: 600.0,
+          type: 1,
+          installmentType: 5,
+          preferentialPolicy: '',
+          monthAmount: 600.0,
+        },
+      ],
+      code: 0,
+      data: {
+        id: 4324841822093439,
+        gradeId: 4282344219607140,
+        name: '红太阳幼儿园2019年学费',
+        type: 0,
+        formType: 1,
+        feeYear: null,
+        feeTotal: null,
+        firstRate: null,
+        firstAmount: null,
+        formContent: null,
+        createTime: 1546606105851,
+        updateTime: 1546606105851,
+      },
+      items: [],
+    });
+  }, 2000);
 }
 
 function cascade(req, res) {
@@ -54,7 +113,7 @@ function cascade(req, res) {
 
 export default {
   // 'POST /ajax/pay/pay/payment': payment,
-  // 'GET /ajax/form/form/detail': detail,
+  'GET /ajax/form/form/detail': detail,
   // 'GET /ajax/grade/GradeClass/getGradeAndClassByFormId': cascade,
   'GET /api/500': (req, res) => {
     res.status(500).send({

@@ -205,7 +205,7 @@ class Payment extends PureComponent {
             })}
           >
             <Item
-              thumb={<Classes width="22" fill="#FFA800" />}
+              thumb={<Classes width="22" className={styles.svg} />}
               className={styles.cascade}
               error={getFieldError('classId')}
             />
@@ -219,7 +219,7 @@ class Payment extends PureComponent {
               rules: [{ required: true, message: '请输入学生姓名' }],
             })}
           >
-            <Student width="20" color="#FFA800" />
+            <Student width="20" fill="#FFA800" />
           </InputItem>
           <InputItem
             placeholder="请输入缴费人姓名"
@@ -230,7 +230,7 @@ class Payment extends PureComponent {
               rules: [{ required: true, message: '请输入缴费人姓名' }],
             })}
           >
-            <Pay width="20" color="#FFA800" />
+            <Pay width="20" fill="#FFA800" />
           </InputItem>
           <InputItem
             type="phone"
@@ -244,7 +244,7 @@ class Payment extends PureComponent {
               ],
             })}
           >
-            <Phone width="20" color="#FFA800" />
+            <Phone width="20" fill="#FFA800" />
           </InputItem>
         </List>
         <WhiteSpace />

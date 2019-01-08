@@ -1,14 +1,12 @@
 import React, { Fragment, PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import Swiper from 'swiper';
-import isEqual from 'lodash/isEqual';
 import cs from 'classnames';
 
 import styles from './style.less';
 
 const stagingMap = {
   1: ['专享12个月免息', '常规1年付', '一年连续'],
-  2: ['专享24个月免息', '常规1年付', '两年连续'], // 总金额
+  2: ['专享24个月免息', '常规2年付', '两年连续'], // 总金额
   3: ['专享6个月免息', '常规学期付', '学期连续'],
   4: ['专享3个月免息', '常规季付', '季度连续'],
   5: ['常规月付', '常规月付', '按月缴费'],
@@ -41,23 +39,12 @@ export default class Staging extends PureComponent {
 
   swipper = null;
 
-  componentWillReceiveProps(nextProps) {
-    const { data: currData, onChange } = this.props;
-    if (!isEqual(nextProps.data, currData) && nextProps.data.length > 0) {
-      const { id } = nextProps.data[0];
-      this.setState({ id }, () => {
-        this.swiper = new Swiper(this.el.current, {
-          slidesPerView: 2.3,
-          spaceBetween: 10,
-          freeMode: true,
-        });
-        onChange(nextProps.data[0]);
-      });
-    }
-  }
-
-  componentWillUnmount() {
-    this.swiper.destroy();
+  componentDidMount() {
+    const { data, onChange } = this.props;
+    const { id } = data[0];
+    this.setState({ id }, () => {
+      onChange(data[0]);
+    });
   }
 
   handleClick = item => () => {
@@ -71,7 +58,7 @@ export default class Staging extends PureComponent {
     const { id } = this.state;
     return (
       <div className="swiper-container" ref={this.el}>
-        <div className="swiper-wrapper">
+        <div className={styles.swiperWrapper}>
           {data.map(item => (
             <dl
               key={item.id}
@@ -85,7 +72,7 @@ export default class Staging extends PureComponent {
                   <Fragment>
                     <del>￥{item.amount}元</del>
                     <p>
-                      <small>每月仅</small>￥{item.monthAmount}
+                      <small>每月仅</small>￥{item.monthAmount.toFixed(2)}
                     </p>
                   </Fragment>
                 )}
@@ -93,7 +80,7 @@ export default class Staging extends PureComponent {
                   <Fragment>
                     <del />
                     <p>
-                      <small>总金额</small>￥{item.amount}
+                      <small>总金额</small>￥{item.amount.toFixed(2)}
                     </p>
                   </Fragment>
                 )}

@@ -24,12 +24,12 @@ const plugins = [
       dynamicImport: {
         loadingComponent: './components/PageLoading/index',
       },
-      // pwa: {
-      //   workboxPluginMode: 'InjectManifest',
-      //   workboxOptions: {
-      //     importWorkboxFrom: 'local',
-      //   },
-      // },
+      pwa: {
+        workboxPluginMode: 'InjectManifest',
+        workboxOptions: {
+          importWorkboxFrom: 'local',
+        },
+      },
       ...(!process.env.TEST && os.platform() === 'darwin'
         ? {
             dll: {
@@ -60,6 +60,7 @@ export default {
   targets: {
     ie: 11,
   },
+  hash: true,
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
   },

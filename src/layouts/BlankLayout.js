@@ -1,5 +1,4 @@
 import React from 'react';
-import { Layout } from 'antd';
 import DocumentTitle from 'react-document-title';
 import isEqual from 'lodash/isEqual';
 import memoizeOne from 'memoize-one';
@@ -7,13 +6,12 @@ import { connect } from 'dva';
 import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
 import pathToRegexp from 'path-to-regexp';
-import Media from 'react-media';
 import { formatMessage } from 'umi/locale';
 import Authorized from '@/utils/Authorized';
 import Context from './MenuContext';
 import Exception403 from '../pages/Exception/403';
 
-const { Content } = Layout;
+import './BlankLayout.less';
 
 const query = {
   'screen-xs': {
@@ -100,17 +98,9 @@ class BasicLayout extends React.PureComponent {
 
     const routerConfig = this.getRouterAuthority(pathname, routes);
     const layout = (
-      <Layout
-        style={{
-          minHeight: '100vh',
-        }}
-      >
-        <Content>
-          <Authorized authority={routerConfig} noMatch={<Exception403 />}>
-            {children}
-          </Authorized>
-        </Content>
-      </Layout>
+      <Authorized authority={routerConfig} noMatch={<Exception403 />}>
+        {children}
+      </Authorized>
     );
     return (
       <React.Fragment>
@@ -118,7 +108,7 @@ class BasicLayout extends React.PureComponent {
           <ContainerQuery query={query}>
             {params => (
               <Context.Provider value={this.getContext()}>
-                <div className={classNames(params)}>{layout}</div>
+                <div className={classNames(params)}>{children}</div>
               </Context.Provider>
             )}
           </ContainerQuery>
@@ -130,8 +120,4 @@ class BasicLayout extends React.PureComponent {
 
 export default connect(({ menu }) => ({
   breadcrumbNameMap: menu.breadcrumbNameMap,
-}))(props => (
-  <Media query="(max-width: 599px)">
-    {isMobile => <BasicLayout {...props} isMobile={isMobile} />}
-  </Media>
-));
+}))(BasicLayout);

@@ -6,6 +6,7 @@ export default [
     routes: [
       { path: '/payment', component: './Payment' },
       { path: '/tuition', component: './Tuition' },
+      { path: '/shared', component: './Shared' },
       {
         path: '/result',
         routes: [
