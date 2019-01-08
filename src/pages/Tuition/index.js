@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { List, InputItem, WhiteSpace, Picker, Button, Toast, Icon } from 'antd-mobile';
+import { List, InputItem, WhiteSpace, Button, Toast } from 'antd-mobile';
 import { createForm } from 'rc-form';
 import qs from 'qs';
 import router from 'umi/router';
 import Loading from '@/components/PageLoading';
 import { isWeChat } from '@/utils/userAgent';
+import InputSelect from './InputSelect';
 import Staging from './Staging';
 import { ReactComponent as Student } from '@/assets/icon/xuesheng.svg';
 import { ReactComponent as Pay } from '@/assets/icon/jiaofeiren.svg';
@@ -30,7 +31,7 @@ class Tuition extends PureComponent {
       this.defaultPayType = 1;
     }
     // 支付方法 1 支付宝，2 微信, 5 寺库
-    this.state = { payType: this.defaultPayType, studentInputWay: 'input' };
+    this.state = { payType: this.defaultPayType };
   }
 
   componentWillMount() {
@@ -41,7 +42,7 @@ class Tuition extends PureComponent {
 
     const { formId, classId, code, state } = query;
     if ((isWeChat() && !(code && state)) || !isWeChat()) {
-      // 微信未走支付流程，或者其他客户端访问
+      // 微信未认证，或者其他客户端访问，就走这里
       localStorage.setItem('id', query.formId);
       if (formId) {
         dispatch({ type: 'tuition/detail', payload: { id: formId } });
@@ -113,10 +114,6 @@ class Tuition extends PureComponent {
         });
       }
     });
-  };
-
-  handleStudentInputWay = studentInputWay => () => {
-    this.setState({ studentInputWay });
   };
 
   handleStagingChange = item => {
@@ -207,7 +204,6 @@ class Tuition extends PureComponent {
       submitting,
       location: { query },
     } = this.props;
-    const { studentInputWay } = this.state;
     const { name } = summary;
 
     return (
@@ -217,48 +213,18 @@ class Tuition extends PureComponent {
         学生信息
         <WhiteSpace size="lg" />
         <List>
-          {studentInputWay === 'pick' && (
-            <div className={styles.student}>
-              <Picker
-                extra="请选择学生"
-                title="选择学生"
-                data={students}
-                cols={1}
-                {...getFieldProps('studentId', {
-                  rules: [{ required: true, message: '请选择学生' }],
-                })}
-              >
-                <List.Item
-                  thumb={<Student width="20" fill="#3F73DA" />}
-                  error={getFieldError('studentId')}
-                />
-              </Picker>
-              <Icon
-                type="right"
-                color="#a0a0a0"
-                style={{ position: 'absolute', right: '2.5rem' }}
-              />
-              <a onClick={this.handleStudentInputWay('input')}>添加新生</a>
-            </div>
-          )}
-          {studentInputWay === 'input' && (
-            <div className={styles.student}>
-              <div>
-                <InputItem
-                  placeholder="请输入学生姓名"
-                  labelNumber={2}
-                  maxLength="20"
-                  error={getFieldError('studentName')}
-                  {...getFieldProps('studentName', {
-                    rules: [{ required: true, message: '请输入学生姓名' }],
-                  })}
-                >
-                  <Student width="20" fill="#3F73DA" />
-                </InputItem>
-              </div>
-              <a onClick={this.handleStudentInputWay('pick')}>选择学生</a>
-            </div>
-          )}
+          <InputSelect
+            dataSource={students}
+            placeholder="请输入学生姓名"
+            icon={<Student width="20" fill="#3F73DA" />}
+            error={getFieldError('studentName')}
+            {...getFieldProps('studentName', {
+              initialValue: '',
+              rules: [{ required: true, message: '请输入学生姓名' }],
+            })}
+          >
+            选择学生
+          </InputSelect>
           <InputItem
             placeholder="请输入缴费人姓名"
             labelNumber={2}
