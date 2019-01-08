@@ -113,7 +113,7 @@ function cascade(req, res) {
 
 export default {
   // 'POST /ajax/pay/pay/payment': payment,
-  'GET /ajax/form/form/detail': detail,
+  // 'GET /ajax/form/form/detail': detail,
   // 'GET /ajax/grade/GradeClass/getGradeAndClassByFormId': cascade,
   'GET /api/500': (req, res) => {
     res.status(500).send({

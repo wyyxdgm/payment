@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { List, InputItem, Radio, WhiteSpace, Picker, Button, Toast, Icon } from 'antd-mobile';
+import { List, InputItem, WhiteSpace, Picker, Button, Toast, Icon } from 'antd-mobile';
 import { createForm } from 'rc-form';
 import qs from 'qs';
 import router from 'umi/router';
@@ -10,8 +10,6 @@ import Staging from './Staging';
 import { ReactComponent as Student } from '@/assets/icon/xuesheng.svg';
 import { ReactComponent as Pay } from '@/assets/icon/jiaofeiren.svg';
 import { ReactComponent as Phone } from '@/assets/icon/shouji.svg';
-import { ReactComponent as AliPay } from '@/assets/icon/zhifubao.svg';
-import { ReactComponent as TenPay } from '@/assets/icon/weixinzhifu.svg';
 
 import styles from './style.less';
 
@@ -24,8 +22,6 @@ import styles from './style.less';
 }))
 @createForm()
 class Tuition extends PureComponent {
-  openId = '';
-
   constructor(props) {
     super(props);
 
@@ -43,71 +39,37 @@ class Tuition extends PureComponent {
       dispatch,
     } = this.props;
 
-    const { formId, code, classId, kindergartenId } = query;
-    localStorage.setItem('id', query.formId);
-    if (formId) {
-      dispatch({ type: 'tuition/detail', payload: { id: formId } });
-    }
-    if (classId) {
-      dispatch({ type: 'tuition/student', payload: { classId } });
-    }
-    // 微信客户端访问，如果没有得到code就跳微信转授权页面，微信会自动重定向携带code
-    if (isWeChat()) {
-      if (!code) {
-        dispatch({
-          type: 'tuition/appId',
-          payload: { kindergartenId },
-          callback: content => {
-            if (!content) {
-              return;
-            }
-            const { weChatAPPID } = JSON.parse(content);
-            const payload = {
-              appid: weChatAPPID,
-              redirect_uri: window.location.href,
-              response_type: 'code',
-              scope: 'snsapi_base',
-              state: 'STATE',
-            };
-            window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?${qs.stringify(
-              payload
-            )}#wechat_redirect`;
-          },
-        });
-      } else {
-        // 通过得到的code取openid
-        dispatch({
-          type: 'tuition/openId',
-          payload: { code, kindergartenId },
-          callback: responseData => {
-            this.openId = responseData;
-          },
-        });
+    const { formId, classId, code, state } = query;
+    if ((isWeChat() && !(code && state)) || !isWeChat()) {
+      // 微信未走支付流程，或者其他客户端访问
+      localStorage.setItem('id', query.formId);
+      if (formId) {
+        dispatch({ type: 'tuition/detail', payload: { id: formId } });
       }
+      if (classId) {
+        dispatch({ type: 'tuition/student', payload: { classId } });
+      }
+    } else if (isWeChat()) {
+      // 微信访问，并且是授权后跳转回来，这里走微信支付流程
+      const [orderNo, typeId, kindergartenId] = state.split('|');
+      // 通过得到的code取openid
+      dispatch({
+        type: 'tuition/openId',
+        payload: { code, kindergartenId },
+        callback: openid => {
+          dispatch({
+            type: 'tuition/getFormInfo',
+            payload: {
+              orderNo,
+              typeId,
+              openid,
+              kindergartenId,
+            },
+            callback: data => this.revokeWeChat(data),
+          });
+        },
+      });
     }
-  }
-
-  // 得到所有支付参数
-  getWeChatParam(orderNo, typeId) {
-    const {
-      dispatch,
-      location: { query },
-    } = this.props;
-
-    if (!this.openId) {
-      alert('当前园所不支持微信支付');
-      return;
-    }
-    dispatch({
-      type: 'tuition/getFormInfo',
-      payload: {
-        orderNo,
-        typeId,
-        openid: this.openId,
-        kindergartenId: query.kindergartenId,
-      },
-      callback: data => this.revokeWeChat(data),
-    });
   }
 
   validate = () => {
@@ -145,17 +107,12 @@ class Tuition extends PureComponent {
               document.body.innerHTML = responseData;
               document.forms[0].submit();
             } else if (payType === 2) {
-              this.getWeChatParam(responseData, this.typeId);
+              this.oauth(responseData, this.typeId);
             }
           },
         });
       }
     });
-  };
-
-  // 支付方式选择
-  handleRadioChange = payType => () => {
-    this.setState({ payType });
   };
 
   handleStudentInputWay = studentInputWay => () => {
@@ -166,6 +123,40 @@ class Tuition extends PureComponent {
     this.typeId = item.id;
     this.setState({ payType: item.type === 2 ? 5 : this.defaultPayType });
   };
+
+  // 微信授权，会使页面重定向
+  oauth(orderNo, typeId) {
+    const {
+      dispatch,
+      location: { query },
+    } = this.props;
+
+    const { kindergartenId } = query;
+
+    dispatch({
+      type: 'tuition/appId',
+      payload: { kindergartenId },
+      callback: content => {
+        if (!content) {
+          return;
+        }
+        const { weChatAPPID } = JSON.parse(content);
+        const payload = {
+          appid: weChatAPPID,
+          redirect_uri: window.location.href,
+          response_type: 'code',
+          scope: 'snsapi_base',
+          state: `${orderNo}|${typeId}|${kindergartenId}`,
+        };
+        window.location.replace(
+          `https://open.weixin.qq.com/connect/oauth2/authorize?${qs.stringify(
+            payload
+          )}#wechat_redirect`
+        );
+        // 重新跳转回来后处理的逻辑在componentWillMount里
+      },
+    });
+  }
 
   revokeWeChat(data) {
     try {
@@ -216,7 +207,7 @@ class Tuition extends PureComponent {
       submitting,
       location: { query },
     } = this.props;
-    const { payType, studentInputWay } = this.state;
+    const { studentInputWay } = this.state;
     const { name } = summary;
 
     return (
@@ -299,30 +290,10 @@ class Tuition extends PureComponent {
         <WhiteSpace size="lg" />
         <div className={styles.staging}>
           <Staging data={staging} onChange={this.handleStagingChange} />
-          <List className={styles.payList}>
-            {!isWeChat() && payType <= 2 && (
-              <Radio.RadioItem
-                thumb={<AliPay width="20" fill="#4BA7E8" />}
-                checked={payType === 1}
-                onChange={this.handleRadioChange(1)}
-              >
-                支付宝支付
-              </Radio.RadioItem>
-            )}
-            {isWeChat() && payType <= 2 && (
-              <Radio.RadioItem
-                thumb={<TenPay width="20" fill="#5AC53A" />}
-                checked={payType === 2}
-                onChange={this.handleRadioChange(2)}
-              >
-                微信支付
-              </Radio.RadioItem>
-            )}
-          </List>
         </div>
         <WhiteSpace size="xl" />
         <div className={styles.btnArea}>
-          <Button onClick={() => this.validate()} loading={submitting}>
+          <Button onClick={this.validate} loading={submitting}>
             立即支付
           </Button>
         </div>
@@ -333,7 +304,6 @@ class Tuition extends PureComponent {
   render() {
     const { detailLoading } = this.props;
     return detailLoading === undefined || detailLoading ? <Loading /> : this.normal();
-    // return this.normal();
   }
 }
 
