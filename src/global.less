@@ -43,14 +43,23 @@ ol {
 }
 
 .am-list-body {
-  .am-list-item:not(:last-child), >div:not(:last-child) {
-    position: relative;
-    .hairline('bottom');
+  border-radius: 5px;
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+  .hairline-remove('top');
+  .hairline-remove('bottom');
+
+  .am-list-item {
+    min-height: 60px;
+    padding-left: unset !important;
   }
-  >div:not([class]) {
+  > div {
     margin: 0 15px;
-    .am-list-item {
-      margin: unset;
+
+    // 在list-body下第一级div增加下边框
+    &:not(:last-child) {
+      position: relative;
+      .hairline('bottom');
     }
   }
 }
@@ -60,15 +69,14 @@ ol {
   flex-basis: unset !important;
 }
 
-.am-list-item,
-.am-list-item.am-input-item {
-  padding-left: unset !important;
-  margin: 0 15px;
-}
-
+// 取消原版下边框
 .am-list-line {
+  .hairline-remove('bottom');
   border-bottom: none !important;
   padding-right: unset !important;
+  .am-input-control input {
+    font-size: 15px !important;
+  }
 }
 
 .am-picker-popup-item {
@@ -77,7 +85,8 @@ ol {
 
 .am-picker-col-indicator {
   border-color: #f1f1f1 !important;
-  &:before, &:after {
+  &:before,
+  &:after {
     background-color: #f1f1f1 !important;
   }
 }
@@ -94,10 +103,4 @@ ol {
 
 .am-picker-col-item-selected {
   font-size: 14px !important;
-}
-
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
-  html:not([data-scale]) .am-list-body div:not(:last-child) .am-list-line:after {
-    height: unset !important;
-  }
 }

@@ -6,20 +6,6 @@
   background-size: 100%;
 
   :global {
-    .am-list-body {
-      border-radius: 5px;
-      &:before {
-        background-color: unset !important;
-      }
-      &:after {
-        background-color: unset !important;
-      }
-    }
-    .am-list-item {
-      min-height: 60px;
-      background-color: unset;
-    }
-
     .am-radio-inner {
       top: 23px !important;
     }
@@ -32,30 +18,6 @@
       &:before {
         border-width: 0 !important;
       }
-    }
-
-    .am-input-control input {
-      font-size: 15px;
-    }
-  }
-}
-
-.student {
-  display: flex;
-  align-items: center;
-  margin: 0 15px;
-  > div {
-    flex: 1;
-    margin: 0 -15px !important;
-  }
-  > a {
-    padding: 5px;
-    color: #ed775a;
-  }
-  :global {
-    .am-list-content {
-      color: #ccc !important;
-      font-size: 15px !important;
     }
   }
 }
@@ -75,7 +37,7 @@
 .staging {
   .card;
 
-  padding: 8px 8px 18px;
+  padding: 8px;
 
   .swiperWrapper {
     display: flex;
@@ -135,16 +97,6 @@
         color: #ed775a;
       }
     }
-  }
-
-  // 支付方式标题
-  > p {
-    position: relative;
-    margin: 0;
-    padding: 20px 0 10px;
-  }
-  .payList {
-    margin: 0 -8px -10px;
   }
 }
 
