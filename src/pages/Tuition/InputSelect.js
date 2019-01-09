@@ -53,7 +53,7 @@ export default class extends PureComponent {
             {icon}
           </InputItem>
         </div>
-        <Picker title="选择学生" data={dataSource} cols={1} onChange={this.handlePickerChange}>
+        <Picker title={children} data={dataSource} cols={1} onChange={this.handlePickerChange}>
           <a>{children}</a>
         </Picker>
       </div>
