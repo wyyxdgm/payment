@@ -93,6 +93,7 @@ class Tuition extends PureComponent {
         ...values,
         studentId: values.studentId ? values.studentId[0] : 0,
         typeId: this.typeId,
+        classId: query.classId,
         className: query.className,
         payPhone: values.payPhone.replace(/\s/g, ''),
       };
