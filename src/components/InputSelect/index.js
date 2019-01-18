@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { InputItem, Picker } from 'antd-mobile';
 import find from 'lodash/find';
 
-import styles from './InputSelect.less';
+import styles from './index.less';
 
 function getLabel(data, value) {
   const item = find(data, { value: value[0] });
@@ -13,6 +13,14 @@ function getLabel(data, value) {
   return '';
 }
 
+function getValue(data, label) {
+  const item = find(data, { label });
+  if (item) {
+    return item.value;
+  }
+  return 0;
+}
+
 export default class extends PureComponent {
   static propTypes = {
     dataSource: PropTypes.array,
@@ -20,7 +28,10 @@ export default class extends PureComponent {
     icon: PropTypes.element,
     placeholder: PropTypes.string,
     onChange: PropTypes.func,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    value: PropTypes.shape({
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    }),
   };
 
   static defaultProps = {
@@ -28,17 +39,22 @@ export default class extends PureComponent {
     error: false,
     icon: '',
     placeholder: '请输入',
-    value: PropTypes.string,
+    value: { label: '', value: 0 },
     onChange() {},
   };
 
   handlePickerChange = val => {
     const { dataSource, onChange } = this.props;
-    onChange(getLabel(dataSource, val));
+    onChange({ label: getLabel(dataSource, val), value: val[0] });
+  };
+
+  handleInputChange = val => {
+    const { dataSource, onChange } = this.props;
+    onChange({ label: val, value: getValue(dataSource, val) });
   };
 
   render() {
-    const { dataSource, error, icon, onChange, value, placeholder, children } = this.props;
+    const { dataSource, error, icon, value, placeholder, children } = this.props;
     return (
       <div className={styles.container}>
         <div>
@@ -47,8 +63,8 @@ export default class extends PureComponent {
             labelNumber={2}
             maxLength="20"
             error={error}
-            value={value}
-            onChange={onChange}
+            value={value.label}
+            onChange={this.handleInputChange}
           >
             {icon}
           </InputItem>

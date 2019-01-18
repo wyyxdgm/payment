@@ -13,10 +13,6 @@ export async function detail(payload) {
   return request(`/ajax/form/form/detail?${qs.stringify(payload)}`);
 }
 
-export async function cascade(payload) {
-  return request(`/ajax/grade/GradeClass/getGradeAndClassByFormId?${qs.stringify(payload)}`);
-}
-
 export async function student(payload) {
   return request(`/ajax/people/Student/query?${qs.stringify(payload)}`);
 }

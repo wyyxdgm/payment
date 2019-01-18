@@ -1,39 +1,6 @@
-import mapKeys from 'lodash/mapKeys';
-import find from 'lodash/find';
 import qs from 'qs';
-import { submit, detail, cascade, openId, getFormInfo } from '@/services/pay';
+import { submit, detail, openId, getFormInfo, student } from '@/services/pay';
 import { jsonToFormData } from '@/utils/convert';
-
-const keyMap = {
-  gradeId: 'value',
-  classId: 'value',
-  gradeName: 'label',
-  className: 'label',
-  classResultList: 'children',
-};
-
-// 把服务端的数据字段转为cascade所需要的格式
-function toCascade(data) {
-  return data.map(item => {
-    const newItem = mapKeys(item, (value, key) => keyMap[key] || key);
-    if (newItem.children) {
-      newItem.children = toCascade(newItem.children);
-    }
-    return newItem;
-  });
-}
-
-// 通过年级班级值得到名称
-function getClassName(data, gId, cId) {
-  const grade = find(data, { value: gId });
-  if (grade) {
-    const classRow = find(grade.children, { value: cId });
-    if (classRow) {
-      return classRow.label;
-    }
-  }
-  return '';
-}
 
 export default {
   namespace: 'pay',
@@ -45,25 +12,14 @@ export default {
       firstAmount: 0,
       formContent: [],
     },
-    classes: [],
     typeId: 0,
-    result: {
-      status: 'ok',
-      message: '',
-    }
+    students: [],
   },
 
   effects: {
     // 支付提交
-    *submit({ payload, callback }, { call, select }) {
-      const { classes, typeId } = yield select(({ pay }) => ({
-        classes: pay.classes,
-        typeId: pay.typeId,
-      }));
-      const className = getClassName(classes, ...payload.classId);
-      const payPhone = payload.payPhone.replace(/\s/g, '');
-      const classId = payload.classId.slice(-1).pop();
-      const formData = jsonToFormData({ ...payload, payPhone, classId, className, typeId });
+    *submit({ payload, callback }, { call, }) {
+      const formData = jsonToFormData({ ...payload });
       const response = yield call(submit, formData);
       if (callback) {
         callback(response);
@@ -94,10 +50,12 @@ export default {
       }
     },
 
-    // 年级、班级联动菜单
-    *cascade({ payload }, { call, put }) {
-      const response = yield call(cascade, { ...payload });
-      yield put({ type: 'cascadeComplete', payload: response });
+    // 学生列表
+    *student({ payload }, { call, put }) {
+      const response = yield call(student, { ...payload });
+      if (response.code === 0) {
+        yield put({ type: 'studentComplete', payload: response });
+      }
     },
   },
 
@@ -110,9 +68,14 @@ export default {
 
       return { ...state, summary: { name, formContent, feeTotal, firstAmount }, typeId };
     },
-    cascadeComplete(state, action) {
-      const classes = toCascade(action.payload);
-      return { ...state, classes };
+
+    studentComplete(state, action) {
+      const { data } = action.payload;
+      const students = data.map(item => ({
+        value: item.id,
+        label: item.name,
+      }));
+      return { ...state, students };
     },
   },
 };

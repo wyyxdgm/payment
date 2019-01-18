@@ -1,5 +1,4 @@
 import qs from 'qs';
-import findIndex from 'lodash/findIndex';
 import { submit, detail, student, appId, openId, getFormInfo } from '@/services/pay';
 import { jsonToFormData } from '@/utils/convert';
 

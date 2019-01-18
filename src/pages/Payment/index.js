@@ -1,40 +1,34 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { List, InputItem, Radio, WhiteSpace, Picker, Button, Toast } from 'antd-mobile';
+import { List, InputItem, WhiteSpace, Button, Toast } from 'antd-mobile';
 import { createForm } from 'rc-form';
 import qs from 'qs';
 import router from 'umi/router';
+import Loading from '@/components/PageLoading';
+import InputSelect from '@/components/InputSelect';
 import { isWeChat } from '@/utils/userAgent';
-import { ReactComponent as Classes } from '@/assets/icon/banji.svg';
 import { ReactComponent as Student } from '@/assets/icon/xuesheng.svg';
 import { ReactComponent as Pay } from '@/assets/icon/jiaofeiren.svg';
 import { ReactComponent as Phone } from '@/assets/icon/shouji.svg';
-import { ReactComponent as AliPay } from '@/assets/icon/zhifubao.svg';
-import { ReactComponent as TenPay } from '@/assets/icon/weixinzhifu.svg';
 
 import styles from './style.less';
 
-const { Item } = List;
-
 @connect(({ pay, loading }) => ({
   summary: pay.summary,
-  classSource: pay.classes,
   typeId: pay.typeId,
+  students: pay.students,
   submitting: loading.effects['pay/submit'],
+  detailLoading: loading.effects['pay/detail'],
 }))
 @createForm()
 class Payment extends PureComponent {
-  openId = '';
-
   constructor(props) {
     super(props);
 
-    let payType = 2;
-    if (!isWeChat()) {
-      payType = 1;
-    }
-    // 支付方法 1 支付宝，2 微信
+    const payType = isWeChat() ? 2 : 1;
+    // 支付方法 1 支付宝，2 微信, 5 寺库
     this.state = { payType };
+    this.typeId = 0;
   }
 
   componentWillMount() {
@@ -43,55 +37,42 @@ class Payment extends PureComponent {
       dispatch,
     } = this.props;
 
-    const { formId, code } = query;
-    // 微信客户端访问，如果没有得到code就跳微信转授权页面，微信会自动重定向携带code
-    if (!code && isWeChat()) {
-      const payload = {
-        appid: 'wx978d1cc596ecc4db',
-        redirect_uri: window.location.href,
-        response_type: 'code',
-        scope: 'snsapi_base',
-        state: 'STATE',
-      };
-      window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?${qs.stringify(
-        payload
-      )}#wechat_redirect`;
-    } else if (formId) {
-      dispatch({ type: 'pay/detail', payload: { id: formId } });
-      dispatch({ type: 'pay/cascade', payload: { formId } });
-      if (isWeChat()) {
-        // 通过得到的code取openid
-        dispatch({
-          type: 'pay/openId',
-          payload: { code },
-          callback: responseData => {
-            this.openId = responseData;
-          },
-        });
+    const { formId, classId, code, state } = query;
+    if ((isWeChat() && !(code && state)) || !isWeChat()) {
+      // 微信未认证，或者其他客户端访问，就走这里
+      if (formId) {
+        dispatch({ type: 'pay/detail', payload: { id: formId } });
       }
+      if (classId) {
+        dispatch({ type: 'pay/student', payload: { classId } });
+      }
+    } else if (isWeChat()) {
+      const [orderNo, typeId, kindergartenId] = state.split('|');
+      dispatch({
+        type: 'pay/openId',
+        payload: { code, kindergartenId },
+        callback: openid => {
+          dispatch({
+            type: 'pay/getFormInfo',
+            payload: {
+              orderNo,
+              typeId,
+              openid,
+              kindergartenId,
+            },
+            callback: data => this.revokeWeChat(data),
+          });
+        },
+      });
     }
-  }
-
-  // 得到所有支付参数
-  getWeChatParam(orderNo) {
-    const { dispatch, typeId } = this.props;
-
-    dispatch({
-      type: 'pay/getFormInfo',
-      payload: {
-        orderNo,
-        typeId,
-        openid: this.openId,
-        kindergartenId: 0,
-      },
-      callback: data => this.revokeWeChat(data),
-    });
   }
 
   validate = () => {
     const {
+      location: { query },
       form: { validateFields },
       dispatch,
+      typeId,
     } = this.props;
 
     validateFields((error, values) => {
@@ -101,28 +82,50 @@ class Payment extends PureComponent {
       }
 
       const { payType } = this.state;
+      const { student, ...newValues } = values;
       dispatch({
         type: 'pay/submit',
         payload: {
           payType,
-          ...values,
+          ...newValues,
+          studentName: values.student.label,
+          studentId: values.student.value,
+          typeId,
+          classId: query.classId,
+          className: query.className,
+          payPhone: values.payPhone.replace(/\s/g, ''),
         },
         callback: responseData => {
           if (payType === 1) {
             document.body.innerHTML = responseData;
             document.forms[0].submit();
           } else if (payType === 2) {
-            this.getWeChatParam(responseData);
+            this.oauth(responseData, typeId);
           }
         },
       });
     });
   };
 
-  // 支付方式选择
-  handleRadioChange = payType => () => {
-    this.setState({ payType });
-  };
+  // 微信授权，会使页面重定向
+  oauth(orderNo, typeId) {
+    const {
+      location: { query },
+    } = this.props;
+
+    const { kindergartenId } = query;
+    const payload = {
+      appid: 'wx978d1cc596ecc4db',
+      redirect_uri: window.location.href,
+      response_type: 'code',
+      scope: 'snsapi_base',
+      state: `${orderNo}|${typeId}|${kindergartenId}`,
+    };
+    window.location.replace(
+      `https://open.weixin.qq.com/connect/oauth2/authorize?${qs.stringify(payload)}#wechat_redirect`
+    );
+    // 重新跳转回来后处理的逻辑在componentWillMount里
+  }
 
   revokeWeChat(data) {
     try {
@@ -151,27 +154,26 @@ class Payment extends PureComponent {
         switch (res.err_msg) {
           case 'get_brand_wcpay_request:cancel':
             dispatch({ type: 'global/result', payload: { status: 'cancel', message: '' } });
-            router.replace('/result/');
+            router.replace('/result/pay-cancel');
             break;
           case 'get_brand_wcpay_request:fail':
             dispatch({ type: 'global/result', payload: { status: 'fail', message: '' } });
-            router.replace('/result/');
+            router.replace('/result/pay-fail');
             break;
           case 'get_brand_wcpay_request:ok':
-            window.location.href = 'http://m.hoogoo.cn/PaySuccess';
+            window.location.href = 'https://m.hoogoo.cn/PaySuccess';
         }
       }
     );
   }
 
-  render() {
+  normal() {
     const {
       form: { getFieldProps, getFieldError },
       summary,
-      classSource,
+      students,
       submitting,
     } = this.props;
-    const { payType } = this.state;
     const { name, formContent, feeTotal, firstAmount } = summary;
 
     return (
@@ -194,33 +196,17 @@ class Payment extends PureComponent {
           </dd>
         </dl>
         <List renderHeader={() => '学生信息'}>
-          <Picker
-            extra="请选择班级"
-            title="选择班级"
-            data={classSource}
-            cols={2}
-            format={label => label.join(' / ')}
-            {...getFieldProps('classId', {
-              rules: [{ required: true, message: '请选择所在班级' }],
-            })}
-          >
-            <Item
-              thumb={<Classes width="22" className={styles.svg} />}
-              className={styles.cascade}
-              error={getFieldError('classId')}
-            />
-          </Picker>
-          <InputItem
+          <InputSelect
+            dataSource={students}
             placeholder="请输入学生姓名"
-            labelNumber={2}
-            maxLength="20"
-            error={getFieldError('studentName')}
-            {...getFieldProps('studentName', {
+            icon={<Student width="20" fill="#FFA800" />}
+            error={getFieldError('student')}
+            {...getFieldProps('student', {
               rules: [{ required: true, message: '请输入学生姓名' }],
             })}
           >
-            <Student width="20" fill="#FFA800" />
-          </InputItem>
+            选择学生
+          </InputSelect>
           <InputItem
             placeholder="请输入缴费人姓名"
             labelNumber={2}
@@ -249,28 +235,6 @@ class Payment extends PureComponent {
         </List>
         <WhiteSpace />
 
-        <List>
-          {!isWeChat() && (
-            <Radio.RadioItem
-              thumb={<AliPay width="20" fill="#4BA7E8" />}
-              checked={payType === 1}
-              onChange={this.handleRadioChange(1)}
-            >
-              支付宝支付
-            </Radio.RadioItem>
-          )}
-          {isWeChat() && (
-            <Radio.RadioItem
-              thumb={<TenPay width="20" fill="#5AC53A" />}
-              checked={payType === 2}
-              onChange={this.handleRadioChange(2)}
-            >
-              微信支付
-            </Radio.RadioItem>
-          )}
-        </List>
-        <WhiteSpace />
-
         <div className={styles.btnArea}>
           <Button onClick={() => this.validate()} loading={submitting}>
             确认支付 <span className={styles.btnPrice}>￥{firstAmount.toFixed(2)}</span>
@@ -278,6 +242,11 @@ class Payment extends PureComponent {
         </div>
       </div>
     );
+  }
+
+  render() {
+    const { detailLoading } = this.props;
+    return detailLoading === undefined || detailLoading ? <Loading /> : this.normal();
   }
 }
 

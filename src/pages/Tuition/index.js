@@ -6,7 +6,7 @@ import qs from 'qs';
 import router from 'umi/router';
 import Loading from '@/components/PageLoading';
 import { isWeChat } from '@/utils/userAgent';
-import InputSelect from './InputSelect';
+import InputSelect from '@/components/InputSelect';
 import Staging from './Staging';
 import { ReactComponent as Student } from '@/assets/icon/xuesheng.svg';
 import { ReactComponent as Pay } from '@/assets/icon/jiaofeiren.svg';
@@ -87,11 +87,12 @@ class Tuition extends PureComponent {
       }
 
       const { payType } = this.state;
+      const {student, ...newValues} = values;
       const payload = {
         payType,
-        studentName: '',
-        ...values,
-        studentId: values.studentId ? values.studentId[0] : 0,
+        ...newValues,
+        studentName: values.student.label,
+        studentId: values.student.value,
         typeId: this.typeId,
         classId: query.classId,
         className: query.className,
@@ -218,9 +219,8 @@ class Tuition extends PureComponent {
             dataSource={students}
             placeholder="请输入学生姓名"
             icon={<Student width="20" fill="#3F73DA" />}
-            error={getFieldError('studentName')}
-            {...getFieldProps('studentName', {
-              initialValue: '',
+            error={getFieldError('student')}
+            {...getFieldProps('student', {
               rules: [{ required: true, message: '请输入学生姓名' }],
             })}
           >
