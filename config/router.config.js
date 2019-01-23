@@ -8,6 +8,19 @@ export default [
       { path: '/tuition', component: './Tuition' },
       { path: '/shared', component: './Shared' },
       {
+        path: '/campaign1',
+        routes: [
+          { path: '.', redirect: '/campaign1/patriarch' },
+          {
+            path: 'patriarch',
+            routes: [
+              { path: '.', component: './Campaign1/Patriarch' },
+              { path: 'bonus', name: '和谷猪年送豪礼', component: './Campaign1/Bonus' },
+            ],
+          },
+        ],
+      },
+      {
         path: '/result',
         routes: [
           { path: '/result', redirect: '/result/pay-success' },

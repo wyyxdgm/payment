@@ -115,6 +115,11 @@ export default {
   // 'POST /ajax/pay/pay/payment': payment,
   // 'GET /ajax/form/form/detail': detail,
   // 'GET /ajax/grade/GradeClass/getGradeAndClassByFormId': cascade,
+  'POST /api/checkCode': { status: 200 },
+  // code获得用户token
+  'GET /app/promotion/wechat/loginByCode': {code: 200, data: 'xxxxxwwwww'},
+  'POST /app/promotion/wechat/getBonus': {code: 200, data: true},
+
   'GET /api/500': (req, res) => {
     res.status(500).send({
       timestamp: 1513932555104,

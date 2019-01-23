@@ -1,0 +1,59 @@
+@import '~antd-mobile/es/style/mixins/hairline';
+
+.container {
+  padding: 8rem 15px 0;
+  background: url(../../assets/campaign1/bonusBg.png) no-repeat #f82e2c;
+  background-size: 100%;
+  overflow: hidden;
+
+  :global {
+    .am-list-body {
+      border-radius: 5px;
+      &:before {
+        background-color: unset !important;
+      }
+      &:after {
+        background-color: unset !important;
+      }
+    }
+    .am-list-item {
+      min-height: 60px;
+      background-color: unset;
+    }
+
+    .am-input-control input {
+      font-size: 15px;
+    }
+  }
+}
+
+.btnArea {
+  padding: 10px 20px;
+  :global {
+    .am-button {
+      .hairline-remove('all');
+      width: 8.4rem;
+      height: 1.4rem;
+      margin: auto;
+      font-size: 0.53rem;
+      line-height: 1.3rem;
+      color: #9b1e23;
+      background: url(../../assets/campaign1/button.png) no-repeat;
+      background-size: 100% 100%;
+    }
+  }
+}
+
+.iconShared {
+  width: 0.48rem;
+  height: 0.48rem;
+  margin-right: 0.2rem;
+}
+
+.gameRule {
+  margin: 20px 0 30px;
+  img {
+    width: 100%;
+    pointer-events: none;
+  }
+}

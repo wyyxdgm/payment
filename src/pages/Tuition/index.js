@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { List, InputItem, WhiteSpace, Button, Toast } from 'antd-mobile';
+import { List, InputItem, WhiteSpace, Button, Toast, Flex } from 'antd-mobile';
 import { createForm } from 'rc-form';
 import qs from 'qs';
 import router from 'umi/router';
@@ -257,6 +257,10 @@ class Tuition extends PureComponent {
         <WhiteSpace size="lg" />
         <div className={styles.staging}>
           <Staging data={staging} onChange={this.handleStagingChange} />
+          <Flex justify="between" className={styles.coupon}>
+            <div>使用优惠券</div>
+            <div>点击选择优惠券</div>
+          </Flex>
         </div>
         <WhiteSpace size="xl" />
         <div className={styles.btnArea}>
