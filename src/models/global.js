@@ -1,4 +1,4 @@
-import { phoneCheckCode, wxToken, wxShared } from '@/services/global';
+import { wxCheckCode, wxToken, wxShared } from '@/services/global';
 
 export default {
   namespace: 'global',
@@ -18,8 +18,8 @@ export default {
     },
 
     // 手机验证码
-    *checkCode({ payload, callback }, { call }) {
-      const response = yield call(phoneCheckCode, payload);
+    *wxCheckCode({ payload, callback }, { call }) {
+      const response = yield call(wxCheckCode, payload);
       if (callback) {
         callback(response);
       }
@@ -34,6 +34,7 @@ export default {
       }
     },
 
+    // 微信分享前获取相关信息
     *wxShared({payload, callback}, {call}) {
       const response = yield call(wxShared, payload);
       if (response.code === 200) {

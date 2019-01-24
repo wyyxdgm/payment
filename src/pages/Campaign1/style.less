@@ -1,8 +1,11 @@
 @import '~antd-mobile/es/style/mixins/hairline';
 
+.getBonus {
+  background: url(../../assets/campaign1/phBg.png) no-repeat #f82e2c;
+}
+
 .container {
   padding: 8rem 15px 0;
-  background: url(../../assets/campaign1/bonusBg.png) no-repeat #f82e2c;
   background-size: 100%;
   overflow: hidden;
 
@@ -55,5 +58,47 @@
   img {
     width: 100%;
     pointer-events: none;
+  }
+}
+
+// 遮罩分享图片
+.maskShare {
+  float: right;
+  width: 7rem;
+  margin-top: 2rem;
+  margin-right: 1rem;
+  pointer-events: none;
+}
+
+// 遮罩手机号已领过
+.maskUsedPhone {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 20px;
+
+  img {
+    width: 100%;
+    margin-top: -3rem;
+  }
+}
+
+// 公众号二维码
+.gzh {
+  margin: 0.4rem 0;
+  text-align: center;
+  overflow: hidden;
+
+  img {
+    width: 2.67rem;
+  }
+  p {
+    margin: 10px 0;
+    color: #fff;
+    font-size: 12px;
+
+    span {
+      color: #fcedcd;
+    }
   }
 }

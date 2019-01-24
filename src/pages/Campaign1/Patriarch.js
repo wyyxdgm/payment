@@ -1,48 +1,80 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
-import { Button, InputItem, List, Toast, WhiteSpace, Modal } from 'antd-mobile';
+import { Button, InputItem, List, Toast, WhiteSpace } from 'antd-mobile';
 import { createForm } from 'rc-form';
 import cs from 'classnames';
+import qs from 'qs';
 import wx from 'weixin-js-sdk';
 import Loading from '@/components/PageLoading';
-import WXShared from '@/components/WXShared';
+import Mask from '@/components/Mask';
 import InputPhoneText from '@/components/InputPhoneText';
 import { ReactComponent as Shared } from '@/assets/campaign1/icon/shared.svg';
 import gameRule from '@/assets/campaign1/gameRule.png';
+import sharedTip from '@/assets/campaign1/shareTip.png';
+import usedPhone from '@/assets/campaign1/used.png';
+import sharedLinkIcon from '@/assets/campaign1/sharedLinkIcon.png';
 
 import styles from './style.less';
 
-@connect(({ wxToken, loading }) => ({
-  wxToken,
+@connect(({ loading }) => ({
   loading: loading.effects['global/wxToken'],
   sharedLoading: loading.effects['global/wxShared'],
+  getBonusLoading: loading.effects['campaign1/getBonus'],
 }))
 @createForm()
 class Patriarch extends PureComponent {
-  state = { wxShared: false };
+  state = { maskShow: false, maskContent: 'share' };
+
+  componentWillMount() {
+    const {
+      location: { query },
+    } = this.props;
+    const { code } = query;
+
+    // if (process.env.NODE_ENV !== 'production') {
+    //   return;
+    // }
+    if (!code) {
+      const { type, activityId } = query;
+      const payload = {
+        appid: process.env.APP_ID,
+        redirect_uri: window.location.href,
+        response_type: 'code',
+        scope: 'snsapi_userinfo',
+        state: qs.stringify({ type, activityId }),
+      };
+      window.location.replace(
+        `https://open.weixin.qq.com/connect/oauth2/authorize?${qs.stringify(
+          payload
+        )}#wechat_redirect`
+      );
+    }
+  }
 
   validate = () => {
     const {
+      location: { query },
       form: { validateFields },
       dispatch,
-      location: { query },
     } = this.props;
+
+    const { activityId } = query;
 
     validateFields((error, values) => {
       if (error) {
         Toast.info(Object.values(error)[0].errors[0].message, 3, null, false);
         return;
       }
-      const payload = { ...values, payPhone: values.payPhone.replace(/\s/g, '') };
+      const payload = { ...values, mobile: values.mobile.replace(/\s/g, ''), activityId: activityId * 1 };
       dispatch({
         type: 'campaign1/getBonus',
         payload,
-        callback: status => {
-          if (status) {
-            router.replace('coupon');
+        callback: response => {
+          if (response.code === 200) {
+            router.replace('patriarch/bonus');
           } else {
-            Modal.alert('已经抢过了', '该手机好已经抢过了，给别人留点吧');
+            this.setState({ maskShow: true, maskContent: 'phone-used' });
           }
         },
       });
@@ -50,24 +82,28 @@ class Patriarch extends PureComponent {
   };
 
   // 发送验证码
-  handlePhoneTextClick = phone => {
+  handlePhoneTextClick = mobile => {
     const { dispatch } = this.props;
-
     dispatch({
-      type: 'global/checkCode',
-      payload: { phone },
+      type: 'global/wxCheckCode',
+      payload: { mobile, type: 1 },
     });
   };
 
+  // 分享按钮响应
   handleShareClick = () => {
-    const { dispatch } = this.props;
-    const host = 'http://testm.hoogoo.cn';
+    const {
+      location: { query },
+      dispatch,
+    } = this.props;
+    const host = window.location.origin;
+    const { type, activityId } = query;
 
     dispatch({
       type: 'global/wxShared',
-      payload: { shareUrl: host },
+      payload: { shareUrl: host + window.location.pathname },
       callback: data => {
-        this.setState({ wxShared: true });
+        this.setState({ maskShow: true, maskContent: 'share' });
         wx.config({
           debug: false,
           appId: data.appId,
@@ -81,26 +117,26 @@ class Patriarch extends PureComponent {
           wx.onMenuShareAppMessage({
             title: '分享出来就是让你戳进来领红包的',
             desc: '传递新年新财气，和谷春节送大礼',
-            link: `${host}/mform/campaign1/patriarch`,
-            imgUrl: `${host}/images/share.png`,
+            link: `${host}/mform/campaign1/patriarch?${qs.stringify({ type, activityId })}`,
+            imgUrl: host + sharedLinkIcon,
           });
         });
       },
     });
   };
 
-  wxSharedHideHandle = () => {
-    this.setState({ wxShared: false });
+  maskHideHandle = () => {
+    this.setState({ maskShow: false });
   };
 
   normal() {
     const {
       form: { getFieldError, getFieldProps },
-      submitting,
+      getBonusLoading,
       sharedLoading,
     } = this.props;
 
-    const { wxShared } = this.state;
+    const { maskShow, maskContent } = this.state;
 
     return (
       <div className={cs(styles.container, styles.getBonus)}>
@@ -108,8 +144,8 @@ class Patriarch extends PureComponent {
           <InputPhoneText
             placeholder="请输入缴费人手机号"
             onTextButtonClick={this.handlePhoneTextClick}
-            error={getFieldError('payPhone')}
-            {...getFieldProps('payPhone', {
+            error={getFieldError('mobile')}
+            {...getFieldProps('mobile', {
               rules: [
                 { required: true, message: '请输入缴费人手机号' },
                 { len: 13, message: '请输入正确的手机号' },
@@ -129,7 +165,7 @@ class Patriarch extends PureComponent {
         </List>
         <WhiteSpace size="xl" />
         <div className={styles.btnArea}>
-          <Button onClick={this.validate} loading={submitting} disabled={submitting}>
+          <Button onClick={this.validate} loading={getBonusLoading} disabled={getBonusLoading}>
             <span>立即领取</span>
           </Button>
           <WhiteSpace size="xl" />
@@ -141,7 +177,16 @@ class Patriarch extends PureComponent {
         <div className={styles.gameRule}>
           <img src={gameRule} alt="红包规则" />
         </div>
-        <WXShared show={wxShared} onHide={this.wxSharedHideHandle} />
+        <Mask show={maskShow} onHide={this.maskHideHandle}>
+          {maskContent === 'share' && (
+            <img src={sharedTip} className={styles.maskShare} alt="右上角分享" />
+          )}
+          {maskContent === 'phone-used' && (
+            <div className={styles.maskUsedPhone}>
+              <img src={usedPhone} alt="您已领过" />
+            </div>
+          )}
+        </Mask>
       </div>
     );
   }

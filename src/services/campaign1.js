@@ -2,5 +2,10 @@ import qs from 'qs';
 import request from '@/utils/request';
 
 export async function getBonus(payload) {
-  return request(`/app/promotion/wechat/bind`, { method: 'POST', body: payload });
+  const token = sessionStorage.getItem('wxTokenId');
+  return request(`/ajax/app/promotion/coupon/receiveCoupon`, {
+    headers: { token },
+    method: 'POST',
+    body: payload,
+  });
 }

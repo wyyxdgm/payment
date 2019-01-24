@@ -7,6 +7,7 @@ import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
 import pathToRegexp from 'path-to-regexp';
 import { formatMessage } from 'umi/locale';
+import qs from 'qs';
 import Authorized from '@/utils/Authorized';
 import Context from './MenuContext';
 import Exception403 from '../pages/Exception/403';
@@ -47,10 +48,10 @@ class BasicLayout extends React.PureComponent {
 
   componentWillMount() {
     const { location, dispatch } = this.props;
-    const { code } = location.query;
+    const { code, type } = location.query;
     const wxTokenId = sessionStorage.getItem('wxTokenId');
-    if (!wxTokenId && code) {
-      dispatch({ type: 'global/wxToken', payload: { code } });
+    if (!wxTokenId && code && type) {
+      dispatch({ type: 'global/wxToken', payload: { code, type } });
     }
   }
 
@@ -117,7 +118,9 @@ class BasicLayout extends React.PureComponent {
           <ContainerQuery query={query}>
             {params => (
               <Context.Provider value={this.getContext()}>
-                <div className={classNames(params)}>{children}</div>
+                <div className={classNames(params)}>
+                  {children}
+                </div>
               </Context.Provider>
             )}
           </ContainerQuery>

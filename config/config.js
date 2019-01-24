@@ -63,6 +63,7 @@ export default {
   hash: true,
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
+    'process.env.APP_ID': 'wx978d1cc596ecc4db',
   },
   base: '/mform',
   publicPath: '/mform/',
@@ -78,8 +79,12 @@ export default {
   },
   proxy: {
     '/ajax': {
-      target: 'http://mgr.hoogoo.cn/',
-    },
+      target: 'http://testm.hoogoo.cn/',
+      changeOrigin: true,
+      bypass: function(req) {
+        // console.log(req.headers);
+      }
+    }
   },
   ignoreMomentLocale: true,
   lessLoaderOptions: {

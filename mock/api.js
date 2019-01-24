@@ -117,8 +117,8 @@ export default {
   // 'GET /ajax/grade/GradeClass/getGradeAndClassByFormId': cascade,
   'POST /api/checkCode': { status: 200 },
   // code获得用户token
-  'GET /app/promotion/wechat/loginByCode': {code: 200, data: 'xxxxxwwwww'},
-  'POST /app/promotion/wechat/getBonus': {code: 200, data: true},
+  // 'GET /ajax/app/promotion/wechat/loginByCode': {code: 200, data: 'xxxxxwwwww'},
+  'POST /app/promotion/wechat/getBonus': {code: 200, data: false},
 
   'GET /api/500': (req, res) => {
     res.status(500).send({
