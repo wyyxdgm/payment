@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { List, InputItem, WhiteSpace, Button, Toast, Flex } from 'antd-mobile';
+import { List, InputItem, WhiteSpace, Button, Toast, Flex, Icon } from 'antd-mobile';
 import { createForm } from 'rc-form';
 import qs from 'qs';
 import router from 'umi/router';
@@ -259,10 +259,10 @@ class Tuition extends PureComponent {
           <Staging data={staging} onChange={this.handleStagingChange} />
           <Flex justify="between" className={styles.coupon}>
             <div>使用优惠券</div>
-            <div>点击选择优惠券</div>
+            <div><span>暂无可用优惠券</span><Icon type="right" /></div>
           </Flex>
         </div>
-        <WhiteSpace size="xl" />
+        <WhiteSpace />
         <div className={styles.btnArea}>
           <Button onClick={this.validate} loading={submitting}>
             立即支付
