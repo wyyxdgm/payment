@@ -11,7 +11,7 @@ export async function wxToken(payload) {
   return request(`/ajax/app/promotion/wechat/loginByCode?${qs.stringify(payload)}`);
 }
 
-// 微信分享请求组串
-export async function wxShared(payload) {
+// 微信jsTicket
+export async function wxJsTicket(payload) {
   return request(`/ajax/account/Account/getWechatShareConfigByUrl?${qs.stringify(payload)}`);
 }

@@ -1,4 +1,4 @@
-import { wxCheckCode, wxToken, wxShared } from '@/services/global';
+import { wxCheckCode, wxToken, wxJsTicket } from '@/services/global';
 
 export default {
   namespace: 'global',
@@ -34,9 +34,9 @@ export default {
       }
     },
 
-    // 微信分享前获取相关信息
-    *wxShared({payload, callback}, {call}) {
-      const response = yield call(wxShared, payload);
+    // 微信jsTicket，utils/wxJsTicket里使用
+    *wxJsTicket({payload, callback}, {call}) {
+      const response = yield call(wxJsTicket, payload);
       if (response.code === 200) {
         if (callback) {
           callback(response);

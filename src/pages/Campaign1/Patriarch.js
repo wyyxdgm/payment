@@ -5,10 +5,11 @@ import { Button, InputItem, List, Toast, WhiteSpace } from 'antd-mobile';
 import { createForm } from 'rc-form';
 import cs from 'classnames';
 import qs from 'qs';
-import wx from 'weixin-js-sdk';
 import Loading from '@/components/PageLoading';
 import Mask from '@/components/Mask';
 import InputPhoneText from '@/components/InputPhoneText';
+import wxJsTicket from '@/utils/wxJsTicket';
+
 import { ReactComponent as Shared } from '@/assets/campaign1/icon/shared.svg';
 import gameRule from '@/assets/campaign1/gameRule.png';
 import sharedTip from '@/assets/campaign1/shareTip.png';
@@ -18,9 +19,8 @@ import sharedLinkIcon from '@/assets/campaign1/sharedLinkIcon.png';
 import styles from './style.less';
 
 @connect(({ loading }) => ({
-  loading: loading.effects['global/wxToken'],
-  sharedLoading: loading.effects['global/wxShared'],
-  getBonusLoading: loading.effects['campaign1/getBonus'],
+  loading: loading.effects['global/wxToken'] || loading.effects['global/wxJsTicket'],
+  bonusLoading: loading.effects['campaign1/getBonus'],
 }))
 @createForm()
 class Patriarch extends PureComponent {
@@ -32,9 +32,6 @@ class Patriarch extends PureComponent {
     } = this.props;
     const { code } = query;
 
-    // if (process.env.NODE_ENV !== 'production') {
-    //   return;
-    // }
     if (!code) {
       const { type, activityId } = query;
       const payload = {
@@ -49,9 +46,21 @@ class Patriarch extends PureComponent {
           payload
         )}#wechat_redirect`
       );
+    } else {
+      wxJsTicket().then(wx => {
+        const host = window.location.origin;
+        const { type, activityId } = query;
+        wx.onMenuShareAppMessage({
+          title: '分享出来就是让你戳进来领红包的',
+          desc: '传递新年新财气，和谷春节送大礼',
+          link: `${host}/mform/campaign1/patriarch?${qs.stringify({ type, activityId })}`,
+          imgUrl: host + sharedLinkIcon,
+        });
+      });
     }
   }
 
+  // 领取红包
   validate = () => {
     const {
       location: { query },
@@ -59,20 +68,24 @@ class Patriarch extends PureComponent {
       dispatch,
     } = this.props;
 
-    const { activityId } = query;
+    const { type, activityId } = query;
 
     validateFields((error, values) => {
       if (error) {
         Toast.info(Object.values(error)[0].errors[0].message, 3, null, false);
         return;
       }
-      const payload = { ...values, mobile: values.mobile.replace(/\s/g, ''), activityId: activityId * 1 };
+      const payload = {
+        ...values,
+        mobile: values.mobile.replace(/\s/g, ''),
+        activityId: activityId * 1,
+      };
       dispatch({
         type: 'campaign1/getBonus',
         payload,
         callback: response => {
           if (response.code === 200) {
-            router.replace('patriarch/bonus');
+            router.replace(`patriarch/got-bonus?${qs.stringify({ type, activityId })}`);
           } else {
             this.setState({ maskShow: true, maskContent: 'phone-used' });
           }
@@ -92,37 +105,7 @@ class Patriarch extends PureComponent {
 
   // 分享按钮响应
   handleShareClick = () => {
-    const {
-      location: { query },
-      dispatch,
-    } = this.props;
-    const host = window.location.origin;
-    const { type, activityId } = query;
-
-    dispatch({
-      type: 'global/wxShared',
-      payload: { shareUrl: host + window.location.pathname },
-      callback: data => {
-        this.setState({ maskShow: true, maskContent: 'share' });
-        wx.config({
-          debug: false,
-          appId: data.appId,
-          timestamp: parseInt(data.timestamp, 10),
-          nonceStr: data.nonceStr,
-          signature: data.signature,
-          jsApiList: ['onMenuShareAppMessage'],
-        });
-
-        wx.ready(() => {
-          wx.onMenuShareAppMessage({
-            title: '分享出来就是让你戳进来领红包的',
-            desc: '传递新年新财气，和谷春节送大礼',
-            link: `${host}/mform/campaign1/patriarch?${qs.stringify({ type, activityId })}`,
-            imgUrl: host + sharedLinkIcon,
-          });
-        });
-      },
-    });
+    this.setState({ maskShow: true, maskContent: 'share' });
   };
 
   maskHideHandle = () => {
@@ -133,7 +116,6 @@ class Patriarch extends PureComponent {
     const {
       form: { getFieldError, getFieldProps },
       getBonusLoading,
-      sharedLoading,
     } = this.props;
 
     const { maskShow, maskContent } = this.state;
@@ -169,7 +151,7 @@ class Patriarch extends PureComponent {
             <span>立即领取</span>
           </Button>
           <WhiteSpace size="xl" />
-          <Button onClick={this.handleShareClick} loading={sharedLoading} disabled={sharedLoading}>
+          <Button onClick={this.handleShareClick}>
             <Shared fill="#9B1E23" className={styles.iconShared} />
             <span>分享给好友</span>
           </Button>
@@ -192,8 +174,12 @@ class Patriarch extends PureComponent {
   }
 
   render() {
-    const { loading } = this.props;
-    return loading ? <Loading /> : this.normal();
+    const {
+      location: { query },
+      loading,
+    } = this.props;
+    const { code } = query;
+    return loading || !code ? <Loading /> : this.normal();
   }
 }
 

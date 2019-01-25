@@ -12,7 +12,7 @@ export default [
         routes: [
           { path: '.', redirect: '/campaign1/patriarch' },
           { path: 'patriarch', name: '和谷猪年送豪礼', component: './Campaign1/Patriarch' },
-          { path: 'bonus', name: '和谷学费宝发红包啦', component: './Campaign1/Bonus' },
+          { path: 'got-bonus', name: '和谷学费宝发红包啦', component: './Campaign1/GotBonus' },
         ],
       },
       {
