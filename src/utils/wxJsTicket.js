@@ -12,11 +12,11 @@ export default function() {
     // eslint-disable-next-line no-underscore-dangle
     window.g_app._store.dispatch({
       type: 'global/wxJsTicket',
-      payload: { shareUrl: host + window.location.pathname },
+      payload: { shareUrl: window.location.href },
       callback: data => {
         jsTicket = true;
         wx.config({
-          debug: process.env.NODE_ENV === 'development',
+          debug: false, // process.env.NODE_ENV === 'development',
           appId: data.appId,
           timestamp: parseInt(data.timestamp, 10),
           nonceStr: data.nonceStr,
