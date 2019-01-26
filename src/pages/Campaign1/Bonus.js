@@ -58,16 +58,15 @@ class Bonus extends PureComponent {
       location: { query },
       dispatch,
     } = this.props;
-    const { code, activityId } = query;
+    const { code, activityId = 0 } = query;
 
     if (!code) {
-      const { type } = query;
       const payload = {
         appid: process.env.APP_ID,
         redirect_uri: window.location.href,
         response_type: 'code',
         scope: 'snsapi_userinfo',
-        state: qs.stringify({ type, activityId }),
+        state: 'STATE',
       };
       window.location.replace(
         `https://open.weixin.qq.com/connect/oauth2/authorize?${qs.stringify(
