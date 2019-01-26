@@ -1,20 +1,38 @@
 import wx from 'weixin-js-sdk';
 
-let jsTicket = false;
+let status = 'init'; // waiting | done
+
+function pool(resolve) {
+  if (status === 'done') {
+    resolve(wx);
+  } else if (status === 'waiting') {
+    setTimeout(() => {
+      pool(resolve);
+    }, 1000);
+  }
+}
+
 // 向服务器请求jsTicket，如果已经请求过则直接返回Promise的resolve
 export default function() {
   return new Promise(resolve => {
-    if (jsTicket) {
+    if (status === 'done') {
       resolve(wx);
       return;
     }
-    const host = window.location.origin;
+
+    if (status === 'waiting') {
+      pool(resolve);
+      return;
+    }
+
+    status = 'waiting';
+
     // eslint-disable-next-line no-underscore-dangle
     window.g_app._store.dispatch({
       type: 'global/wxJsTicket',
       payload: { shareUrl: window.location.href },
       callback: data => {
-        jsTicket = true;
+        status = 'done';
         wx.config({
           debug: false, // process.env.NODE_ENV === 'development',
           appId: data.appId,
