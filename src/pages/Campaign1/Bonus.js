@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import { Toast, ListView } from 'antd-mobile';
 import cs from 'classnames';
 import qs from 'qs';
+import moment from 'moment';
 import wxToken from '@/utils/wxToken';
 
 import styles from './Bonus.less';
@@ -12,6 +13,10 @@ const statusMap = {
   2: '使用中',
   3: '已过期',
 };
+
+function formatDate(date) {
+  return moment(date).format('YYYY-MM-DD');
+}
 
 function row(rowData, sectionID, rowID) {
   return (
@@ -28,7 +33,7 @@ function row(rowData, sectionID, rowID) {
         <div>
           <p>单笔满{rowData.reachAmount}元可用</p>
           <p>
-            {rowData.startTime}～{rowData.endTime}
+            {formatDate(rowData.startTime)}～{formatDate(rowData.endTime)}
           </p>
         </div>
       </dd>
