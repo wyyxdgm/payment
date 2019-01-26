@@ -85,7 +85,7 @@ class Patriarch extends PureComponent {
         payload,
         callback: response => {
           if (response.code === 200) {
-            router.replace(`patriarch/got-bonus?${qs.stringify({ type, activityId })}`);
+            router.replace(`got-bonus?${qs.stringify({ type, activityId })}`);
           } else {
             this.setState({ maskShow: true, maskContent: 'phone-used' });
           }
