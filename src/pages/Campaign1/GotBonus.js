@@ -30,22 +30,26 @@ const desc = {
 };
 const link = {
   kg: `/mform/campaign1/kindergarten?`,
-  ph: `/mform/campaign1/patriarch?`,
+  ph: `/mform/campaign1/mark?`,
 };
 const imgUrl = {
   kg: sharedLinkIconKg,
   ph: sharedLinkIcon,
+};
+const typeMap = {
+  kg: 2,
+  ph: 1,
 };
 
 // 切换幼儿园和家长分享 sort: kg | ph
 function sharedContent(sort) {
   const query = getPageQuery();
   const host = window.location.origin;
-  const { type, activityId } = query;
+  const { activityId } = query;
   return {
     title: title[sort],
     desc: desc[sort],
-    link: host + link[sort] + qs.stringify({ type, activityId }),
+    link: host + link[sort] + qs.stringify({ type: typeMap[sort], activityId }),
     imgUrl: host + imgUrl[sort],
   };
 }
