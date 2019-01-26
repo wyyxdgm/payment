@@ -84,10 +84,12 @@ class Patriarch extends PureComponent {
         type: 'campaign1/getBonus',
         payload,
         callback: response => {
-          if (response.code === 200) {
+          if (response.code === 10005) {
+            this.setState({ maskShow: true, maskContent: 'phone-used' });
+          } else if (response.code === 200) {
             router.replace(`got-bonus?${qs.stringify({ type, activityId })}`);
           } else {
-            this.setState({ maskShow: true, maskContent: 'phone-used' });
+            Toast.info(response.message);
           }
         },
       });
