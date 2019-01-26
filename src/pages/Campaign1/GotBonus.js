@@ -1,10 +1,13 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Button, WhiteSpace } from 'antd-mobile';
+import { Button, WhiteSpace, Toast } from 'antd-mobile';
 import cs from 'classnames';
 import qs from 'qs';
 import Mask from '@/components/Mask';
 import { getPageQuery } from '@/utils/utils';
+import Loading from '@/components/PageLoading';
+import wxJsTicket from '@/utils/wxJsTicket';
+import wxToken from '@/utils/wxToken';
 import BonusSwipe from './BonusSwip';
 
 import sharedLinkIconKg from '@/assets/campaign1/sharedLinkIconKg.png';
@@ -15,8 +18,7 @@ import imgGzh from '@/assets/campaign1/gongzhonghao.png';
 import 'swiper/dist/css/swiper.css';
 
 import common from './style.less';
-import styles from './bonus.less';
-import wxJsTicket from '@/utils/wxJsTicket';
+import styles from './GotBonus.less';
 
 const title = {
   kg: '标记园所送福利，先到先得很给力',
@@ -48,14 +50,31 @@ function sharedContent(sort) {
   };
 }
 
-@connect(({ loading }) => ({
-  loading: loading.effects['global/wxToken'] || loading.effects['global/wxJsTicket'],
-  getBonusLoading: loading.effects['campaign1/getBonus'],
+@connect(({ campaign1, loading }) => ({
+  bonusAmount: campaign1.bonusAmount,
+  bonusList: campaign1.bonusList,
+  loading:
+    loading.effects['global/wxToken'] ||
+    loading.effects['global/wxJsTicket'] ||
+    loading.effects['campaign1/bonusList'],
 }))
 class GotBonus extends PureComponent {
   state = { maskShow: false };
 
   componentWillMount() {
+    const {
+      location: { query },
+      dispatch,
+    } = this.props;
+    const { activityId } = query;
+
+    if (activityId) {
+      wxToken().then(() => {
+        dispatch({ type: 'campaign1/bonusList', payload: { activityId } });
+      });
+    } else {
+      Toast.info('请指定一个优惠活动');
+    }
     const item = sharedContent('ph');
     wxJsTicket().then(wx => {
       wx.onMenuShareAppMessage(item);
@@ -75,13 +94,14 @@ class GotBonus extends PureComponent {
     });
   };
 
-  render() {
+  normal() {
     const { maskShow } = this.state;
+    const { bonusAmount, bonusList } = this.props;
 
     return (
       <div className={cs(styles.container)}>
-        <div className={styles.amount}>2620</div>
-        <BonusSwipe />
+        <div className={styles.amount}>{bonusAmount}</div>
+        <BonusSwipe data={bonusList} />
         <div className={styles.guide}>
           <img src={imgGuide} alt="红包使用攻略" />
         </div>
@@ -104,6 +124,11 @@ class GotBonus extends PureComponent {
         </Mask>
       </div>
     );
+  }
+
+  render() {
+    const { loading } = this.props;
+    return loading ? <Loading /> : this.normal();
   }
 }
 

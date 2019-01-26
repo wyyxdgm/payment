@@ -46,15 +46,6 @@ class BasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
   }
 
-  componentWillMount() {
-    const { location, dispatch } = this.props;
-    const { code, type } = location.query;
-    const wxTokenId = sessionStorage.getItem('wxTokenId');
-    if (!wxTokenId && code && type) {
-      dispatch({ type: 'global/wxToken', payload: { code, type } });
-    }
-  }
-
   getContext() {
     const { location, breadcrumbNameMap } = this.props;
     return {

@@ -113,12 +113,13 @@ function cascade(req, res) {
 
 export default {
   // 'POST /ajax/pay/pay/payment': payment,
-  // 'GET /ajax/form/form/detail': detail,
+  'GET /ajax/form/form/detail': detail,
   // 'GET /ajax/grade/GradeClass/getGradeAndClassByFormId': cascade,
   'POST /api/checkCode': { status: 200 },
   // code获得用户token
   // 'GET /ajax/app/promotion/wechat/loginByCode': {code: 200, data: 'xxxxxwwwww'},
-  'POST /app/promotion/wechat/getBonus': {code: 200, data: false},
+  // 'POST /ajax/app/promotion/coupon/receiveCoupon': {code: 200, data: true},
+  // 'GET /ajax/app/promotion/coupon/queryCouponListByActivityId': function(req, res) {console.log(req); res.send({code: 200, data: []})},
 
   'GET /api/500': (req, res) => {
     res.status(500).send({
