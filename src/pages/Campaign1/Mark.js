@@ -182,7 +182,7 @@ class Mark extends PureComponent {
             />
             <div className={styles.mapTip}>
               <p>
-                <Pos width="15" />
+                <Pos width="12" style={{margin: '0 5px -3px 0'}} />
                 {mapAddress}
               </p>
               <p>

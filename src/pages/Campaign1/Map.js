@@ -8,11 +8,13 @@ const { qq } = window;
 export default class Map extends PureComponent {
   static propTypes = {
     onChange: PropTypes.func,
+    onPrtAddress: PropTypes.func,
     value: PropTypes.object,
   };
 
   static defaultProps = {
     onChange() {},
+    onPrtAddress() {},
     value: { latitude: 39.91485, longitude: 116.403765 },
   };
 
@@ -30,6 +32,20 @@ export default class Map extends PureComponent {
       zoomControl: false,
       mapTypeControl: false,
     });
+
+    // 地图位置反查当前地址信息
+    const { onPrtAddress } = this.props;
+    this.geocoder = new qq.maps.Geocoder({
+      complete: result => {
+        // map.setCenter(result.detail.location);
+        // var marker = new qq.maps.Marker({
+        //   map:map,
+        //   position: result.detail.location
+        // });
+        const { district, street, streetNumber } = result.detail.addressComponents;
+        onPrtAddress(district + streetNumber + (streetNumber ? '' : street));
+      },
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -39,6 +55,8 @@ export default class Map extends PureComponent {
       const center = new qq.maps.LatLng(latitude, longitude);
       this.map.panTo(center);
       this.map.zoomTo(13);
+
+      this.geocoder.getAddress(center);
 
       const circle = new qq.maps.Circle({
         map: this.map,

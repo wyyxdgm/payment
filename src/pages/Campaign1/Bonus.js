@@ -95,20 +95,20 @@ class Bonus extends PureComponent {
     }
   }
 
-  onEndReached = () => {
-    const {
-      location: { query },
-      dispatch,
-    } = this.props;
-    const { activityId } = query;
-    const { isLoading, hasMore } = this.state;
-
-    if (isLoading && !hasMore) {
-      return;
-    }
-    this.setState({ isLoading: true });
-    dispatch({ type: 'campaign1/bonusList', payload: { activityId } });
-  };
+  // onEndReached = () => {
+  //   const {
+  //     location: { query },
+  //     dispatch,
+  //   } = this.props;
+  //   const { activityId } = query;
+  //   const { isLoading, hasMore } = this.state;
+  //
+  //   if (isLoading && !hasMore) {
+  //     return;
+  //   }
+  //   this.setState({ isLoading: true });
+  //   dispatch({ type: 'campaign1/bonusList', payload: { activityId } });
+  // };
 
   normal() {
     const { dataSource } = this.state;

@@ -1,6 +1,5 @@
 import memoizeOne from 'memoize-one';
 import isEqual from 'lodash/isEqual';
-import { formatMessage } from 'umi/locale';
 import Authorized from '@/utils/Authorized';
 
 const { check } = Authorized;
@@ -22,7 +21,7 @@ function formatter(data, parentAuthority, parentName) {
 
       const result = {
         ...item,
-        name: formatMessage({ id: locale, defaultMessage: item.name }),
+        name: item.name,
         locale,
         authority: item.authority || parentAuthority,
       };

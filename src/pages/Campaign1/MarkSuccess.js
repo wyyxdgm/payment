@@ -1,12 +1,11 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Button, WhiteSpace, Toast } from 'antd-mobile';
+import { Button, WhiteSpace } from 'antd-mobile';
 import cs from 'classnames';
 import qs from 'qs';
 import Mask from '@/components/Mask';
 import Loading from '@/components/PageLoading';
 import wxJsTicket from '@/utils/wxJsTicket';
-import wxToken from '@/utils/wxToken';
 
 import sharedLinkIcon from '@/assets/campaign1/sharedLinkIcon.png';
 import sharedTip from '@/assets/campaign1/shareTip.png';
@@ -29,17 +28,8 @@ class MarkSuccess extends PureComponent {
   componentWillMount() {
     const {
       location: { query },
-      dispatch,
     } = this.props;
     const { activityId } = query;
-
-    if (activityId) {
-      wxToken().then(() => {
-        dispatch({ type: 'campaign1/bonusList', payload: { activityId } });
-      });
-    } else {
-      Toast.info('请指定一个优惠活动');
-    }
 
     const host = window.location.origin;
     wxJsTicket().then(wx => {
@@ -94,7 +84,7 @@ class MarkSuccess extends PureComponent {
         <div className={styles.gzh}>
           <img src={imgGzh} alt="公众号" />
           <p>
-            关注和谷学费宝公众号在我的-<span>我的红包</span>即可查看
+            关注和谷学费宝公众号在我的-<span>进度查询</span>即可查看
           </p>
         </div>
 

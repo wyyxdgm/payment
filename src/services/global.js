@@ -3,7 +3,10 @@ import qs from 'qs';
 
 // 手机验证码
 export async function wxCheckCode(payload) {
-  return request(`/ajax/app/promotion/common/msm/sendCheckCode?${qs.stringify(payload)}`);
+  const token = sessionStorage.getItem('wxTokenId');
+  return request(`/ajax/app/promotion/common/msm/sendCheckCode?${qs.stringify(payload)}`, {
+    headers: { token },
+  });
 }
 
 // 微信根据code获取token

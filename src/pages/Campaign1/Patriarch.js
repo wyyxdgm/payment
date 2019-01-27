@@ -34,13 +34,12 @@ class Patriarch extends PureComponent {
     const { code } = query;
 
     if (!code) {
-      const { type, activityId } = query;
       const payload = {
         appid: process.env.APP_ID,
         redirect_uri: window.location.href,
         response_type: 'code',
         scope: 'snsapi_userinfo',
-        state: qs.stringify({ type, activityId }),
+        state: 'STATE',
       };
       window.location.replace(
         `https://open.weixin.qq.com/connect/oauth2/authorize?${qs.stringify(
@@ -102,10 +101,24 @@ class Patriarch extends PureComponent {
 
   // 发送验证码
   handlePhoneTextClick = mobile => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'global/wxCheckCode',
-      payload: { mobile, type: 1 },
+    const {
+      location: { query },
+      dispatch,
+    } = this.props;
+    const { activityId } = query;
+
+    wxToken().then(() => {
+      dispatch({
+        type: 'global/wxCheckCode',
+        payload: { mobile, activityId, type: 1 },
+        callback: response => {
+          if (response.code === 10005) {
+            this.setState({ maskShow: true, maskContent: 'phone-used' });
+          } else if (response.code === 200) {
+            Toast.info(response.data, 3, null, false);
+          }
+        },
+      });
     });
   };
 
