@@ -28,7 +28,7 @@ function Wait({ onLink }) {
 
 export default class extends PureComponent {
   handleWaitLink = () => {
-    router.push(`/campaign1/mark?type=2`);
+    window.location.href = `https://agent.hoogoo.cn/apply/school.html?userId=0&agentId=1`;
   };
 
   render() {
