@@ -5,6 +5,8 @@ import cs from 'classnames';
 import qs from 'qs';
 import moment from 'moment';
 import wxToken from '@/utils/wxToken';
+import NoData from '@/components/NoData';
+import Loading from '@/components/PageLoading';
 
 import styles from './Bonus.less';
 
@@ -108,9 +110,8 @@ class Bonus extends PureComponent {
     dispatch({ type: 'campaign1/bonusList', payload: { activityId } });
   };
 
-  render() {
-    const { dataSource, isLoading } = this.state;
-
+  normal() {
+    const { dataSource } = this.state;
     return (
       <div className={cs(styles.bonus)}>
         <ListView
@@ -123,8 +124,18 @@ class Bonus extends PureComponent {
           onEndReached={this.onEndReached}
           onEndReachedThreshold={10}
         />
+        {dataSource.rowIdentities.length === 0 && <NoData />}
       </div>
     );
+  }
+
+  render() {
+    const {
+      location: { query },
+      loading,
+    } = this.props;
+    const { code } = query;
+    return loading || !code ? <Loading /> : this.normal();
   }
 }
 
