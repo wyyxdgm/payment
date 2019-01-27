@@ -14,8 +14,9 @@ export default [
           { path: 'patriarch', name: '和谷猪年送豪礼', component: './Campaign1/Patriarch' },
           { path: 'got-bonus', name: '和谷学费宝发红包啦', component: './Campaign1/GotBonus' },
           { path: 'bonus', name: '我的红包', component: './Campaign1/Bonus' },
-          { path: 'mark', name: '和谷猪年送豪礼', component: './Campaign1/Mark'},
-          { path: 'markSuccess', name: '和谷猪年送豪礼', component: './Campaign1/MarkSuccess'}
+          { path: 'mark', name: '和谷猪年送豪礼', component: './Campaign1/Mark' },
+          { path: 'markSuccess', name: '和谷猪年送豪礼', component: './Campaign1/MarkSuccess' },
+          { path: 'progress', name: '进度查询', component: './Campaign1/Progress' },
         ],
       },
       {
