@@ -37,7 +37,7 @@ export default class BonusSwip extends PureComponent {
                 {item.couponAmount}
                 <small>元</small>
               </dd>
-              <dd>月付{(item.reachAmount - item.couponAmount) / item.useScope}元起可用</dd>
+              <dd>月付{Math.floor((item.reachAmount - item.couponAmount) / item.useScope)}元起可用</dd>
             </dl>
           ))}
         </div>
