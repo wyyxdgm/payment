@@ -29,8 +29,8 @@ const desc = {
   ph: '传递新年新财气，和谷春节送大礼',
 };
 const link = {
-  kg: `/mform/campaign1/kindergarten?`,
-  ph: `/mform/campaign1/mark?`,
+  kg: `/mform/campaign1/mark?`,
+  ph: `/mform/campaign1/patriarch?`,
 };
 const imgUrl = {
   kg: sharedLinkIconKg,
