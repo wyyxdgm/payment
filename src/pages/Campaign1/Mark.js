@@ -10,6 +10,9 @@ import Map from './Map';
 
 import { ReactComponent as Student } from '@/assets/icon/xuesheng.svg';
 import { ReactComponent as Phone } from '@/assets/icon/shouji.svg';
+import { ReactComponent as Kg } from '@/assets/icon/yuansuo.svg';
+import { ReactComponent as Address } from '@/assets/icon/dizhi.svg';
+import { ReactComponent as Pos } from '@/assets/icon/pos.svg';
 
 import styles from './style.less';
 import wxToken from '@/utils/wxToken';
@@ -21,7 +24,7 @@ import wxJsTicket from '@/utils/wxJsTicket';
 }))
 @createForm()
 class Mark extends PureComponent {
-  state = { latitude: 0, longitude: 0 };
+  state = { latitude: 0, longitude: 0, mapAddress: '', phAmount: 0 };
 
   componentWillMount() {
     const {
@@ -45,7 +48,6 @@ class Mark extends PureComponent {
       return;
     }
     wxToken();
-    wxJsTicket();
   }
 
   componentDidMount() {
@@ -60,6 +62,7 @@ class Mark extends PureComponent {
         },
       });
     });
+    this.setState({ phAmount: Math.floor(Math.random() * 10000) + 1000 });
   }
 
   // 领取红包
@@ -93,7 +96,7 @@ class Mark extends PureComponent {
           payload,
           callback: response => {
             if (response.code === 200) {
-              router.replace(`mark/success?${qs.stringify({ type, activityId })}`);
+              router.replace(`markSuccess?${qs.stringify({ type, activityId })}`);
             } else {
               Toast.info(response.message);
             }
@@ -103,13 +106,17 @@ class Mark extends PureComponent {
     });
   };
 
+  handleMapPrtAddress = mapAddress => {
+    this.setState({ mapAddress });
+  };
+
   normal() {
     const {
       form: { getFieldError, getFieldProps },
       submitLoading,
     } = this.props;
 
-    const { latitude, longitude } = this.state;
+    const { latitude, longitude, mapAddress, phAmount } = this.state;
 
     return (
       <div className={cs(styles.container, styles.mark)}>
@@ -124,7 +131,7 @@ class Mark extends PureComponent {
               rules: [{ required: true, message: '请输入园所名称' }],
             })}
           >
-            <Student width="20" fill="#3C70DD" />
+            <Kg width="20" fill="#3C70DD" />
           </InputItem>
           <InputItem
             placeholder="请输入园长姓名"
@@ -157,21 +164,31 @@ class Mark extends PureComponent {
           <InputItem
             placeholder="请输入园所地址"
             labelNumber={2}
-            maxLength="6"
+            maxLength="30"
             clear
             error={getFieldError('address')}
             {...getFieldProps('address', {
               rules: [{ required: true, message: '请输入园所地址' }],
             })}
           >
-            <Student width="20" fill="#3C70DD" />
+            <Address width="20" fill="#3C70DD" />
           </InputItem>
           <List.Item>
             <Map
+              onPrtAddress={this.handleMapPrtAddress}
               {...getFieldProps('coordinate', {
                 initialValue: { latitude, longitude },
               })}
             />
+            <div className={styles.mapTip}>
+              <p>
+                <Pos width="15" />
+                {mapAddress}
+              </p>
+              <p>
+                附近共有<span>{phAmount}</span>个家长找幼儿园
+              </p>
+            </div>
           </List.Item>
         </List>
         <WhiteSpace />
