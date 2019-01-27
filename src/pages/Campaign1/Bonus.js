@@ -28,12 +28,14 @@ function row(rowData, sectionID, rowID) {
           <small>￥</small>
           {rowData.couponAmount}
         </p>
-        <p>满减券</p>
+        <p>{rowData.useScope}期可用免息</p>
       </dt>
       <dd>
         <div>学费优惠券</div>
         <div>
-          <p>单笔满{rowData.reachAmount}元可用</p>
+          <p>
+            月付{Math.floor((rowData.reachAmount - rowData.couponAmount) / rowData.useScope)}元可用
+          </p>
           <p>
             {formatDate(rowData.startTime)}～{formatDate(rowData.endTime)}
           </p>
