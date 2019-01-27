@@ -9,6 +9,7 @@ export default [
       { path: '/shared', component: './Shared' },
       {
         path: '/campaign1',
+        name: '和谷学费宝',
         routes: [
           { path: '.', redirect: '/campaign1/patriarch' },
           { path: 'patriarch', name: '和谷猪年送豪礼', component: './Campaign1/Patriarch' },
