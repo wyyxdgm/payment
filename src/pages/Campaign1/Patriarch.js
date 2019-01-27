@@ -9,6 +9,7 @@ import Loading from '@/components/PageLoading';
 import Mask from '@/components/Mask';
 import InputPhoneText from '@/components/InputPhoneText';
 import wxJsTicket from '@/utils/wxJsTicket';
+import wxToken from '@/utils/wxToken';
 
 import { ReactComponent as Shared } from '@/assets/campaign1/icon/shared.svg';
 import gameRule from '@/assets/campaign1/gameRule.png';
@@ -19,7 +20,7 @@ import sharedLinkIcon from '@/assets/campaign1/sharedLinkIcon.png';
 import styles from './style.less';
 
 @connect(({ loading }) => ({
-  loading: loading.effects['global/wxToken'] || loading.effects['global/wxJsTicket'],
+  loading: loading.effects['global/wxJsTicket'],
   bonusLoading: loading.effects['campaign1/getBonus'],
 }))
 @createForm()
@@ -57,6 +58,7 @@ class Patriarch extends PureComponent {
           imgUrl: host + sharedLinkIcon,
         });
       });
+      wxToken();
     }
   }
 
@@ -80,18 +82,20 @@ class Patriarch extends PureComponent {
         mobile: values.mobile.replace(/\s/g, ''),
         activityId: activityId * 1,
       };
-      dispatch({
-        type: 'campaign1/getBonus',
-        payload,
-        callback: response => {
-          if (response.code === 10005) {
-            this.setState({ maskShow: true, maskContent: 'phone-used' });
-          } else if (response.code === 200) {
-            router.replace(`got-bonus?${qs.stringify({ type, activityId })}`);
-          } else {
-            Toast.info(response.message);
-          }
-        },
+      wxToken().then(() => {
+        dispatch({
+          type: 'campaign1/getBonus',
+          payload,
+          callback: response => {
+            if (response.code === 10005) {
+              this.setState({ maskShow: true, maskContent: 'phone-used' });
+            } else if (response.code === 200) {
+              router.replace(`got-bonus?${qs.stringify({ type, activityId })}`);
+            } else {
+              Toast.info(response.message);
+            }
+          },
+        });
       });
     });
   };
@@ -137,9 +141,11 @@ class Patriarch extends PureComponent {
             })}
           />
           <InputItem
+            type="tel"
             placeholder="请输入手机验证码"
             labelNumber={2}
             maxLength="6"
+            pattern="[0-9]{6}"
             clear
             error={getFieldError('checkCode')}
             {...getFieldProps('checkCode', {
