@@ -93,10 +93,7 @@ class BasicLayout extends React.PureComponent {
     if (!currRouterData) {
       return '和谷学费宝';
     }
-    const pageName = formatMessage({
-      id: currRouterData.locale || currRouterData.name,
-      defaultMessage: currRouterData.name,
-    });
+    const pageName = currRouterData.name;
 
     return `${pageName}`;
   };
