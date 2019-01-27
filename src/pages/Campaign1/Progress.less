@@ -1,0 +1,53 @@
+@import '~antd-mobile/es/style/mixins/hairline';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  img {
+    width: 120px;
+    margin-top: -100px;
+  }
+
+  h1 {
+    margin: 30px 0;
+    font-size: 20px;
+    color: #333;
+  }
+
+  section {
+    margin: 0 0 20px 0;
+    color: #666;
+    p {
+      font-size: 15px;
+      text-align: center;
+      &:last-child {
+        font-size: 12px;
+      }
+    }
+    a {
+      color: #3f73da;
+    }
+  }
+}
+
+.btnArea {
+  padding: 10px 20px;
+  :global {
+    .am-button {
+      .hairline-remove('all');
+      width: 8.4rem;
+      max-width: 315px;
+      height: 45px;
+      margin: auto;
+      font-size: 20px;
+      line-height: 45px;
+      color: #fff;
+      background-color: #f82e2c;
+      border-radius: 45px;
+    }
+  }
+}
