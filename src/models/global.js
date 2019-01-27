@@ -51,6 +51,8 @@ export default {
         if (callback) {
           callback(response);
         }
+      } else {
+        Toast.info('ticket获取异常');
       }
     },
   },
