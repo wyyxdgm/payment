@@ -30,6 +30,7 @@ class Patriarch extends PureComponent {
   componentWillMount() {
     const {
       location: { query },
+      dispatch,
     } = this.props;
     const { code } = query;
 
@@ -47,9 +48,9 @@ class Patriarch extends PureComponent {
         )}#wechat_redirect`
       );
     } else {
+      const { type, activityId } = query;
       wxJsTicket().then(wx => {
         const host = window.location.origin;
-        const { type, activityId } = query;
         wx.onMenuShareAppMessage({
           title: '分享出来就是让你戳进来领红包的',
           desc: '传递新年新财气，和谷春节送大礼',
@@ -57,7 +58,18 @@ class Patriarch extends PureComponent {
           imgUrl: host + sharedLinkIcon,
         });
       });
-      wxToken();
+
+      wxToken().then(() => {
+        dispatch({
+          type: 'campaign1/campaignStatus',
+          payload: { activityId },
+          callback: response => {
+            if (response.code !== 200) {
+              Toast.info(response.message, 3, null, false);
+            }
+          },
+        });
+      });
     }
   }
 
