@@ -3,13 +3,14 @@ import { connect } from 'dva';
 import { Button, WhiteSpace } from 'antd-mobile';
 import cs from 'classnames';
 import qs from 'qs';
+
+import QRCode from '@/components/QRCode';
 import Mask from '@/components/Mask';
 import Loading from '@/components/PageLoading';
 import wxJsTicket from '@/utils/wxJsTicket';
 
 import sharedLinkIcon from '@/assets/campaign1/sharedLinkIcon.png';
 import sharedTip from '@/assets/campaign1/shareTip.png';
-import markMdm from '@/assets/campaign1/markMdm.png';
 import imgGzh from '@/assets/campaign1/gongzhonghao.png';
 import 'swiper/dist/css/swiper.css';
 
@@ -18,23 +19,26 @@ import styles from './style.less';
 @connect(({ campaign1, loading }) => ({
   bonusAmount: campaign1.bonusAmount,
   bonusList: campaign1.bonusList,
-  loading:
-    loading.effects['global/wxToken'] ||
-    loading.effects['global/wxJsTicket']
+  kgName: campaign1.kgName,
+  loading: loading.effects['global/wxToken'] || loading.effects['global/wxJsTicket'],
 }))
 class MarkSuccess extends PureComponent {
   state = { maskShow: false, maskContent: 'share' };
 
   componentWillMount() {
     const {
+      kgName,
       location: { query },
     } = this.props;
     const { activityId } = query;
 
     const host = window.location.origin;
     wxJsTicket().then(wx => {
+      const isContained = /(幼儿园|幼稚园)/.test(kgName);
       wx.onMenuShareAppMessage({
-        title: '分享出来就是让你戳进来领红包的',
+        title: kgName
+          ? `${kgName}${isContained ? '' : '幼儿园'}发福利，猪年给你送豪礼`
+          : '分享出来就是让你戳进来领红包的',
         desc: '传递新年新财气，和谷春节送大礼',
         link: `${host}/mform/campaign1/patriarch?${qs.stringify({ type: 1, activityId })}`,
         imgUrl: host + sharedLinkIcon,
@@ -48,21 +52,7 @@ class MarkSuccess extends PureComponent {
 
   // 分享按钮响应
   handleShareClick = () => {
-    const {
-      location: { query },
-    } = this.props;
-    const { activityId } = query;
-    const host = window.location.origin;
-
     this.setState({ maskShow: true, maskContent: 'share' });
-    wxJsTicket().then(wx => {
-      wx.onMenuShareAppMessage({
-        title: '分享出来就是让你戳进来领红包的',
-        desc: '传递新年新财气，和谷春节送大礼',
-        link: `${host}/mform/campaign1/patriarch?${qs.stringify({ type: 1, activityId })}`,
-        imgUrl: host + sharedLinkIcon,
-      });
-    });
   };
 
   // 面对面撒红包
@@ -72,6 +62,11 @@ class MarkSuccess extends PureComponent {
 
   normal() {
     const { maskShow, maskContent } = this.state;
+    const {
+      location: { query },
+    } = this.props;
+    const { activityId } = query;
+    const host = window.location.origin;
 
     return (
       <div className={cs(styles.container, styles.markSuccess)}>
@@ -94,7 +89,11 @@ class MarkSuccess extends PureComponent {
           )}
           {maskContent === 'mdm' && (
             <div className={styles.maskMdm}>
-              <img src={markMdm} alt="面对面撒红包" />
+              <QRCode
+                size={274}
+                margin={10}
+                text={`${host}/mform/campaign1/patriarch?type=1&activityId=${activityId}`}
+              />
             </div>
           )}
         </Mask>
