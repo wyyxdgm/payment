@@ -1,4 +1,4 @@
-import { getBonus, bonusList, mark } from '@/services/campaign1';
+import { getBonus, bonusList, mark, campaignStatus } from '@/services/campaign1';
 
 export default {
   namespace: 'campaign1',
@@ -6,6 +6,7 @@ export default {
   state: {
     bonusAmount: 0, // 红包总额
     bonusList: [], // 红包列表
+    kgName: '', // 幼儿园名称
   },
 
   effects: {
@@ -26,8 +27,19 @@ export default {
     },
 
     // 标记地图
-    *mark({ payload, callback }, { call }) {
+    *mark({ payload, callback }, { call, put }) {
       const response = yield call(mark, { ...payload });
+      if (callback) {
+        if (response.code === 200) {
+          yield put({ type: 'markComplete', payload: payload.name });
+        }
+        callback(response);
+      }
+    },
+
+    // 判断活动是否未开始或者已结束
+    *campaignStatus({ payload, callback }, { call }) {
+      const response = yield call(campaignStatus, { ...payload });
       if (callback) {
         callback(response);
       }
@@ -39,6 +51,9 @@ export default {
       const data = action.payload;
       const bonusAmount = data.reduce((prev, curr) => prev + curr.couponAmount, 0);
       return { ...state, bonusList: data, bonusAmount };
+    },
+    markComplete(state, action) {
+      return { ...state, kgName: action.payload.toString().trim() };
     },
   },
 };

@@ -28,3 +28,9 @@ export async function mark(payload) {
     body: payload,
   });
 }
+
+export async function campaignStatus(payload) {
+  return request(
+    `/ajax/app/promotion/coupon/getActivityStatusByActivityId?${qs.stringify(payload)}`
+  );
+}
