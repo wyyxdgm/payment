@@ -12,6 +12,11 @@ function pool(resolve) {
   }
 }
 
+// 页面路由发生跳转，需要重新进行请求，并配置
+export function ticketClear() {
+  status = 'init';
+}
+
 // 向服务器请求jsTicket，如果已经请求过则直接返回Promise的resolve
 export default function() {
   return new Promise(resolve => {

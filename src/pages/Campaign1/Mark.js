@@ -6,6 +6,8 @@ import { createForm } from 'rc-form';
 import cs from 'classnames';
 import qs from 'qs';
 import Loading from '@/components/PageLoading';
+import wxToken from '@/utils/wxToken';
+import wxJsTicket, {ticketClear} from '@/utils/wxJsTicket';
 import Map from './Map';
 
 import { ReactComponent as Student } from '@/assets/icon/xuesheng.svg';
@@ -15,8 +17,6 @@ import { ReactComponent as Address } from '@/assets/icon/dizhi.svg';
 import { ReactComponent as Pos } from '@/assets/icon/pos.svg';
 
 import styles from './style.less';
-import wxToken from '@/utils/wxToken';
-import wxJsTicket from '@/utils/wxJsTicket';
 
 @connect(({ loading }) => ({
   loading: loading.effects['global/wxToken'] || loading.effects['global/wxJsTicket'],
@@ -96,6 +96,7 @@ class Mark extends PureComponent {
           payload,
           callback: response => {
             if (response.code === 200) {
+              ticketClear();
               router.replace(`markSuccess?${qs.stringify({ type, activityId })}`);
             } else {
               Toast.info(response.message);
