@@ -70,19 +70,32 @@ class GotBonus extends PureComponent {
       location: { query },
       dispatch,
     } = this.props;
-    const { activityId } = query;
+    const { code, activityId } = query;
 
-    if (activityId) {
+    if (!code) {
+      const payload = {
+        appid: process.env.APP_ID,
+        redirect_uri: window.location.href,
+        response_type: 'code',
+        scope: 'snsapi_userinfo',
+        state: 'STATE',
+      };
+      window.location.replace(
+        `https://open.weixin.qq.com/connect/oauth2/authorize?${qs.stringify(
+          payload
+        )}#wechat_redirect`
+      );
+    } else if (activityId) {
+      const item = sharedContent('ph');
       wxToken().then(() => {
         dispatch({ type: 'campaign1/bonusList', payload: { activityId } });
+      });
+      wxJsTicket().then(wx => {
+        wx.onMenuShareAppMessage(item);
       });
     } else {
       Toast.info('请指定一个优惠活动');
     }
-    const item = sharedContent('ph');
-    wxJsTicket().then(wx => {
-      wx.onMenuShareAppMessage(item);
-    });
   }
 
   maskHideHandle = () => {
@@ -100,6 +113,7 @@ class GotBonus extends PureComponent {
 
   normal() {
     const { maskShow } = this.state;
+
     const { bonusAmount, bonusList } = this.props;
 
     return (
@@ -131,8 +145,12 @@ class GotBonus extends PureComponent {
   }
 
   render() {
-    const { loading } = this.props;
-    return loading ? <Loading /> : this.normal();
+    const {
+      location: { query },
+      loading,
+    } = this.props;
+    const { code } = query;
+    return loading || !code ? <Loading /> : this.normal();
   }
 }
 

@@ -37,6 +37,7 @@
     "bizcharts": "^3.4.0",
     "bizcharts-plugin-slider": "^2.1.1-beta.1",
     "classnames": "^2.2.6",
+    "consolidated-events": "^2.0.2",
     "dva": "^2.4.0",
     "enquire-js": "^0.2.1",
     "global": "^4.3.2",
