@@ -20,6 +20,15 @@ export async function bonusList(payload) {
   );
 }
 
+export async function bonusListPage(payload) {
+  const token = sessionStorage.getItem('wxTokenId');
+  return request(`/ajax/app/promotion/coupon/queryCouponListByActivityIdForPage`, {
+    headers: { token },
+    method: 'POST',
+    body: payload,
+  });
+}
+
 export async function mark(payload) {
   const token = sessionStorage.getItem('wxTokenId');
   return request(`/ajax/app/promotion/sign/kindergarten/signKindergarten`, {

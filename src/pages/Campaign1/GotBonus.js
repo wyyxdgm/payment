@@ -20,40 +20,6 @@ import 'swiper/dist/css/swiper.css';
 import common from './style.less';
 import styles from './GotBonus.less';
 
-const title = {
-  kg: '标记园所送福利，先到先得很给力',
-  ph: '分享出来就是让你戳进来领红包的',
-};
-const desc = {
-  kg: '标记你的幼儿园，送你百万福利！我来出，你来撒～',
-  ph: '传递新年新财气，和谷春节送大礼',
-};
-const link = {
-  kg: `/mform/campaign1/mark?`,
-  ph: `/mform/campaign1/patriarch?`,
-};
-const imgUrl = {
-  kg: sharedLinkIconKg,
-  ph: sharedLinkIcon,
-};
-const typeMap = {
-  kg: 2,
-  ph: 1,
-};
-
-// 切换幼儿园和家长分享 sort: kg | ph
-function sharedContent(sort) {
-  const query = getPageQuery();
-  const host = window.location.origin;
-  const { activityId } = query;
-  return {
-    title: title[sort],
-    desc: desc[sort],
-    link: host + link[sort] + qs.stringify({ type: typeMap[sort], activityId }),
-    imgUrl: host + imgUrl[sort],
-  };
-}
-
 @connect(({ campaign1, loading }) => ({
   bonusAmount: campaign1.bonusAmount,
   bonusList: campaign1.bonusList,
@@ -86,12 +52,17 @@ class GotBonus extends PureComponent {
         )}#wechat_redirect`
       );
     } else if (activityId) {
-      const item = sharedContent('ph');
       wxToken().then(() => {
         dispatch({ type: 'campaign1/bonusList', payload: { activityId } });
       });
       wxJsTicket().then(wx => {
-        wx.onMenuShareAppMessage(item);
+        const host = window.location.origin;
+        wx.onMenuShareAppMessage({
+          title: '分享出来就是让你戳进来领红包的',
+          desc: '传递新年新财气，和谷春节送大礼',
+          link: `${host}/mform/campaign1/patriarch?${qs.stringify({ type: 1, activityId })}`,
+          imgUrl: host + sharedLinkIcon,
+        });
       });
     } else {
       Toast.info('请指定一个优惠活动');
@@ -103,12 +74,17 @@ class GotBonus extends PureComponent {
   };
 
   // 分享按钮响应
-  handleShareClick = sort => () => {
+  handleShareClick = () => {
     this.setState({ maskShow: true });
-    const item = sharedContent(sort);
-    wxJsTicket().then(wx => {
-      wx.onMenuShareAppMessage(item);
-    });
+  };
+
+  handleLink = () => {
+    const {
+      location: { query },
+    } = this.props;
+    const { activityId } = query;
+    const host = window.location.origin;
+    window.location.href = `${host}/mform/campaign1/guide-for-ph?${qs.stringify({ activityId })}`;
   };
 
   normal() {
@@ -125,9 +101,9 @@ class GotBonus extends PureComponent {
         </div>
 
         <div className={common.btnArea}>
-          <Button onClick={this.handleShareClick('ph')}>分享给好友</Button>
+          <Button onClick={this.handleShareClick}>分享给好友</Button>
           <WhiteSpace size="xl" />
-          <Button onClick={this.handleShareClick('kg')}>分享给幼儿园</Button>
+          <Button onClick={this.handleLink}>使用红包</Button>
         </div>
 
         <div className={common.gzh}>

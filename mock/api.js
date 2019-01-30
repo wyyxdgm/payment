@@ -115,23 +115,62 @@ function bonusList(req, res) {
   res.send({
     code: 200,
     data: [
-      {userCouponId: 1, couponAmount: 1000, reachAmount: 500, useScope: 12},
-      {userCouponId: 2, couponAmount: 1000, reachAmount: 500, useScope: 12},
-      {userCouponId: 3, couponAmount: 1000, reachAmount: 500, useScope: 12},
-      {userCouponId: 4, couponAmount: 1000, reachAmount: 500, useScope: 12},
-    ]
-  })
+      { userCouponId: 1, couponAmount: 1000, reachAmount: 500, useScope: 12 },
+      { userCouponId: 2, couponAmount: 1000, reachAmount: 500, useScope: 12 },
+      { userCouponId: 3, couponAmount: 1000, reachAmount: 500, useScope: 12 },
+      { userCouponId: 4, couponAmount: 1000, reachAmount: 500, useScope: 12 },
+    ],
+  });
+}
+
+// 造数据
+function random(x) {
+  return Math.floor(Math.random() * x);
+}
+
+const bonusData = [];
+for (let i = 0; i < 46; i += 1) {
+  const row = [[2, 200], [3, 300], [6, 600], [12, 1000], [24, 2000]][random(5)];
+  bonusData.push({
+    userCouponId: i,
+    couponAmount: row[1],
+    reachAmount: row[1] / 10,
+    useScope: row[0],
+    status: 2,
+  });
+}
+
+function bonusListPage(req, res) {
+  const params = req.body;
+  let pageSize = 10;
+
+  if (params.pageSize) {
+    pageSize = params.pageSize * 1;
+  }
+
+  const result = {
+    code: 200,
+    data: {
+      list: bonusData.slice((params.pageNo - 1) * pageSize, params.pageNo * pageSize),
+      totalCount: bonusData.length,
+      pageSize,
+      pageNo: parseInt(params.pageNo, 10) || 1,
+    },
+  };
+
+  setTimeout(() => res.json(result), 1000);
 }
 
 export default {
   // 'POST /ajax/pay/pay/payment': payment,
-  'GET /ajax/form/form/detail': detail,
+  // 'GET /ajax/form/form/detail': detail,
   // 'GET /ajax/grade/GradeClass/getGradeAndClassByFormId': cascade,
-  'POST /api/checkCode': { status: 200 },
+  // 'POST /api/checkCode': { status: 200 },
   // code获得用户token
-  // 'GET /ajax/app/promotion/wechat/loginByCode': {code: 200, data: 'xxxxxwwwww'},
+  'GET /ajax/app/promotion/wechat/loginByCode': { code: 200, data: 'xxxxxwwwww' },
   // 'POST /ajax/app/promotion/coupon/receiveCoupon': {code: 200, data: true},
   // 'GET /ajax/app/promotion/coupon/queryCouponListByActivityId': bonusList,
+  'POST /ajax/app/promotion/coupon/queryCouponListByActivityIdForPage': bonusListPage,
 
   'GET /api/500': (req, res) => {
     res.status(500).send({

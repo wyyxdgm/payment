@@ -18,6 +18,8 @@ export default [
           { path: 'mark', name: '和谷猪年送豪礼', component: './Campaign1/Mark' },
           { path: 'markSuccess', name: '和谷猪年送豪礼', component: './Campaign1/MarkSuccess' },
           { path: 'progress', name: '进度查询', component: './Campaign1/Progress' },
+          { path: 'guide-for-kg', name: '使用红包攻略', component: './Campaign1/GuideForKG' },
+          { path: 'guide-for-ph', name: '使用红包攻略', component: './Campaign1/GuideForPH' },
         ],
       },
       {

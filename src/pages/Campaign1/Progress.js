@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { Button } from 'antd-mobile';
-import router from 'umi/router';
 import iconWaiting from '../../assets/campaign1/progressWait.png';
 
 import styles from './Progress.less';
@@ -14,7 +13,7 @@ function Wait({ onLink }) {
       <section>
         <p>已提交申请，等待客服处理</p>
         <p>
-          客服人员会在48小时内与您取得联系，或请致电<a href="tel:4008109855">400-810-9855</a>
+          客服人员会在48小时内与您取得联系，或请致电<a href="tel:01062842040">010-62842040</a>
         </p>
       </section>
       <div className={styles.btnArea}>

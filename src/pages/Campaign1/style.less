@@ -15,6 +15,32 @@
   padding: 8.6rem 15px 0;
 }
 
+.guide {
+  overflow: unset !important;
+  background-color: #f82e2c;
+  img {
+    display: block;
+    width: 100%;
+  }
+  .kgBtnArea {
+    height: 5.227rem;
+    padding-top: 1.5rem;
+    background: url(../../assets/campaign1/guide/kg/3.png) no-repeat #f82e2c;
+    background-size: 100%;
+    :global {
+      .am-button {
+        margin: 0.3rem auto;
+      }
+    }
+  }
+  .phBtnArea {
+    height: 4.68rem;
+    padding-top: 2.1rem;
+    background: url(../../assets/campaign1/guide/ph/2.png) no-repeat #f82e2c;
+    background-size: 100%;
+  }
+}
+
 .container {
   background-size: 100%;
   overflow: hidden;
@@ -57,10 +83,16 @@
   }
 }
 
-.iconShared {
+img.iconReg, .iconShared {
+  display: unset;
   width: 0.48rem;
   height: 0.48rem;
   margin-right: 0.2rem;
+  margin-bottom: -0.03rem;
+}
+
+img.iconReg {
+  margin-bottom: 0.15rem;
 }
 
 .gameRule {
@@ -74,7 +106,7 @@
 // 遮罩分享图片
 .maskShare {
   float: right;
-  width: 7rem;
+  width: 7rem !important;
   margin-top: 2rem;
   margin-right: 1rem;
   pointer-events: none;

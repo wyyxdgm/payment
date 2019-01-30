@@ -1,4 +1,15 @@
-import { getBonus, bonusList, mark, campaignStatus } from '@/services/campaign1';
+import { getBonus, bonusList, bonusListPage, mark, campaignStatus } from '@/services/campaign1';
+
+export function convertList(data) {
+  const { list } = data;
+  const pagination = {
+    current: data.pageNo,
+    pageSize: data.pageSize,
+    total: data.totalCount,
+  };
+
+  return { list, pagination };
+}
 
 export default {
   namespace: 'campaign1',
@@ -6,6 +17,7 @@ export default {
   state: {
     bonusAmount: 0, // 红包总额
     bonusList: [], // 红包列表
+    pagination: {}, // 红包页
     kgName: '', // 幼儿园名称
   },
 
@@ -23,6 +35,14 @@ export default {
       const response = yield call(bonusList, { ...payload });
       if (response.code === 200) {
         yield put({ type: 'bonusListComplete', payload: response.data });
+      }
+    },
+
+    // 红包列表 有分页功能
+    *bonusListPage({ payload }, { call, put }) {
+      const response = yield call(bonusListPage, { ...payload });
+      if (response.code === 200) {
+        yield put({ type: 'bonusListPageComplete', payload: response.data });
       }
     },
 
@@ -51,6 +71,14 @@ export default {
       const data = action.payload;
       const bonusAmount = data.reduce((prev, curr) => prev + curr.couponAmount, 0);
       return { ...state, bonusList: data, bonusAmount };
+    },
+    bonusListPageComplete(state, action) {
+      const data = convertList(action.payload);
+      return {
+        ...state,
+        bonusList: [...state.bonusList, ...data.list],
+        pagination: data.pagination,
+      };
     },
     markComplete(state, action) {
       return { ...state, kgName: action.payload.toString().trim() };

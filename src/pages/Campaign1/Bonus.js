@@ -4,6 +4,7 @@ import { Toast, ListView } from 'antd-mobile';
 import cs from 'classnames';
 import qs from 'qs';
 import moment from 'moment';
+import isEqual from 'lodash/isEqual';
 import wxToken from '@/utils/wxToken';
 import NoData from '@/components/NoData';
 import Loading from '@/components/PageLoading';
@@ -15,6 +16,8 @@ const statusMap = {
   2: '使用中',
   3: '已过期',
 };
+
+const PAGE_SIZE = 10;
 
 function formatDate(date) {
   return moment(date).format('YYYY-MM-DD');
@@ -34,7 +37,8 @@ function row(rowData, sectionID, rowID) {
         <div>学费优惠券</div>
         <div>
           <p>
-            月付{Math.floor((rowData.reachAmount - rowData.couponAmount) / rowData.useScope)}元起可用
+            月付{Math.floor((rowData.reachAmount - rowData.couponAmount) / rowData.useScope)}
+            元起可用
           </p>
           <p>
             {formatDate(rowData.startTime)}～{formatDate(rowData.endTime)}
@@ -48,13 +52,13 @@ function row(rowData, sectionID, rowID) {
 
 @connect(({ campaign1, loading }) => ({
   bonusList: campaign1.bonusList,
-  loading: loading.effects['global/wxToken'] || loading.effects['campaign1/bonusList'],
+  pagination: campaign1.pagination,
+  loading: loading.effects['global/wxToken'],
 }))
 class Bonus extends PureComponent {
   state = {
     isLoading: true,
-    hasMore: false,
-    dataSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
+    dataSource: new ListView.DataSource({ rowHasChanged: (prev, next) => prev !== next }),
   };
 
   componentWillMount() {
@@ -79,7 +83,10 @@ class Bonus extends PureComponent {
       );
     } else if (activityId) {
       wxToken().then(() => {
-        dispatch({ type: 'campaign1/bonusList', payload: { activityId } });
+        dispatch({
+          type: 'campaign1/bonusListPage',
+          payload: { activityId, pageNo: 1, pageSize: PAGE_SIZE },
+        });
       });
     } else {
       Toast.info('请指定一个优惠活动');
@@ -88,45 +95,62 @@ class Bonus extends PureComponent {
 
   componentWillReceiveProps(nextProps) {
     // eslint-disable-next-line react/destructuring-assignment
-    if (nextProps.bonusList !== this.props.bonusList) {
+    if (!isEqual(nextProps.pagination, this.props.pagination)) {
       const { dataSource } = this.state;
       this.setState({
         dataSource: dataSource.cloneWithRows(nextProps.bonusList),
         isLoading: false,
+        hasMore: nextProps.bonusList.length < nextProps.pagination.total,
       });
     }
   }
 
-  // onEndReached = () => {
-  //   const {
-  //     location: { query },
-  //     dispatch,
-  //   } = this.props;
-  //   const { activityId } = query;
-  //   const { isLoading, hasMore } = this.state;
-  //
-  //   if (isLoading && !hasMore) {
-  //     return;
-  //   }
-  //   this.setState({ isLoading: true });
-  //   dispatch({ type: 'campaign1/bonusList', payload: { activityId } });
-  // };
+  onEndReached = () => {
+    const {
+      location: { query },
+      dispatch,
+      pagination: { current },
+    } = this.props;
+    const { activityId } = query;
+    const { isLoading, hasMore } = this.state;
+
+    if (isLoading || !hasMore) {
+      return;
+    }
+    this.setState({ isLoading: true });
+    dispatch({
+      type: 'campaign1/bonusListPage',
+      payload: { activityId, pageNo: current + 1, pageSize: PAGE_SIZE },
+    });
+  };
+
+  lvFooter = () => {
+    const { isLoading, hasMore } = this.state;
+    return (
+      <div style={{ paddingTop: 15, textAlign: 'center' }}>
+        {isLoading && '加载中...'}
+        {!isLoading && hasMore && '加载更多'}
+        {!isLoading && !hasMore && '已经到底了'}
+      </div>
+    );
+  };
 
   normal() {
-    const { dataSource } = this.state;
+    const { dataSource, isLoading } = this.state;
     return (
       <div className={cs(styles.bonus)}>
         <ListView
           dataSource={dataSource}
+          renderFooter={this.lvFooter}
           renderRow={row}
           className="am-list"
-          pageSize={1}
+          pageSize={4}
           useBodyScroll
-          scrollRenderAheadDistance={500}
+          scrollRenderAheadDistance={300}
           onEndReached={this.onEndReached}
           onEndReachedThreshold={10}
         />
-        {dataSource.rowIdentities.length === 0 && <NoData />}
+        {!isLoading && dataSource.getRowCount() === 0 && <NoData />}
       </div>
     );
   }
