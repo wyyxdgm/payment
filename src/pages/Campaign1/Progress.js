@@ -13,7 +13,7 @@ function Wait({ onLink }) {
       <section>
         <p>已提交申请，等待客服处理</p>
         <p>
-          客服人员会在48小时内与您取得联系，或请致电<a href="tel:01062842040">010-62842040</a>
+          客服人员会在48小时内与您取得联系，或请致电<a href="tel:4008109855">400-8109855</a>
         </p>
       </section>
       <div className={styles.btnArea}>

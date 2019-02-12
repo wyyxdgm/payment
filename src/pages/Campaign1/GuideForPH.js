@@ -9,7 +9,7 @@ import Loading from '@/components/PageLoading';
 import wxJsTicket from '@/utils/wxJsTicket';
 
 import { ReactComponent as Shared } from '@/assets/campaign1/icon/shared.svg';
-import sharedLinkIcon from '@/assets/campaign1/sharedLinkIcon.png';
+import sharedLinkIconKg from '@/assets/campaign1/sharedLinkIconKg.png';
 import g1 from '@/assets/campaign1/guide/ph/1.png';
 import g3 from '@/assets/campaign1/guide/ph/3.png';
 import g4 from '@/assets/campaign1/guide/ph/4.png';
@@ -43,7 +43,7 @@ class GuideForPH extends PureComponent {
         title: '入驻和谷学费宝，你招生我送钱',
         desc: '稳固生源，资金安全，对账简单，园所升级不再难。',
         link: `${host}/mform/campaign1/guide-for-kg?${qs.stringify({ type: 2, activityId })}`,
-        imgUrl: host + sharedLinkIcon,
+        imgUrl: host + sharedLinkIconKg,
       });
     });
   }
@@ -69,39 +69,17 @@ class GuideForPH extends PureComponent {
             <span>联系园所为您开通</span>
           </Button>
         </div>
-        <LazyLoad height="4.693rem">
-          <img src={g3} alt="红包攻略" />
-        </LazyLoad>
-        <LazyLoad height="4.68rem">
-          <img src={g4} alt="红包攻略" />
-        </LazyLoad>
-        <LazyLoad height="4.693rem">
-          <img src={g5} alt="红包攻略" />
-        </LazyLoad>
-        <LazyLoad height="4.693rem">
-          <img src={g6} alt="红包攻略" />
-        </LazyLoad>
-        <LazyLoad height="4.68rem">
-          <img src={g7} alt="红包攻略" />
-        </LazyLoad>
-        <LazyLoad height="4.693rem">
-          <img src={g8} alt="红包攻略" />
-        </LazyLoad>
-        <LazyLoad height="4.693rem">
-          <img src={g9} alt="红包攻略" />
-        </LazyLoad>
-        <LazyLoad height="4.68rem">
-          <img src={g10} alt="红包攻略" />
-        </LazyLoad>
-        <LazyLoad height="4.693rem">
-          <img src={g11} alt="红包攻略" />
-        </LazyLoad>
-        <LazyLoad height="4.68rem">
-          <img src={g12} alt="红包攻略" />
-        </LazyLoad>
-        <LazyLoad height="4.693rem">
-          <img src={g13} alt="红包攻略" />
-        </LazyLoad>
+        <img src={g3} alt="红包攻略" />
+        <img src={g4} alt="红包攻略" />
+        <img src={g5} alt="红包攻略" />
+        <img src={g6} alt="红包攻略" />
+        <img src={g7} alt="红包攻略" />
+        <img src={g8} alt="红包攻略" />
+        <img src={g9} alt="红包攻略" />
+        <img src={g10} alt="红包攻略" />
+        <img src={g11} alt="红包攻略" />
+        <img src={g12} alt="红包攻略" />
+        <img src={g13} alt="红包攻略" />
 
         <Mask show={maskShow} onHide={this.maskHideHandle}>
           <img src={sharedTip} className={common.maskShare} alt="右上角分享" />
