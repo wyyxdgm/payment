@@ -167,10 +167,10 @@ export default {
   // 'GET /ajax/grade/GradeClass/getGradeAndClassByFormId': cascade,
   // 'POST /api/checkCode': { status: 200 },
   // code获得用户token
-  'GET /ajax/app/promotion/wechat/loginByCode': { code: 200, data: 'xxxxxwwwww' },
+  // 'GET /ajax/app/promotion/wechat/loginByCode': { code: 200, data: 'xxxxxwwwww' },
   // 'POST /ajax/app/promotion/coupon/receiveCoupon': {code: 200, data: true},
   // 'GET /ajax/app/promotion/coupon/queryCouponListByActivityId': bonusList,
-  'POST /ajax/app/promotion/coupon/queryCouponListByActivityIdForPage': bonusListPage,
+  // 'POST /ajax/app/promotion/coupon/queryCouponListByActivityIdForPage': bonusListPage,
 
   'GET /api/500': (req, res) => {
     res.status(500).send({

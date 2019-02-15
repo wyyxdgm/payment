@@ -13,6 +13,7 @@ export default class extends PureComponent {
     onChange: PropTypes.func,
     onTextButtonClick: PropTypes.func,
     value: PropTypes.string,
+    buttonCls: PropTypes.string,
   };
 
   static defaultProps = {
@@ -20,6 +21,7 @@ export default class extends PureComponent {
     icon: '',
     placeholder: '请输入',
     value: '',
+    buttonCls: '',
     onChange() {},
     onTextButtonClick() {},
   };
@@ -27,7 +29,7 @@ export default class extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.intevalID = -1;
+    this.intervalID = -1;
     this.state = {
       countdown: 0,
       status: '',
@@ -64,7 +66,7 @@ export default class extends PureComponent {
   }
 
   render() {
-    const { error, icon, value, placeholder } = this.props;
+    const { error, icon, value, placeholder, buttonCls } = this.props;
     const { status, countdown } = this.state;
     return (
       <div className={cs(styles.container, styles.red)}>
@@ -85,7 +87,7 @@ export default class extends PureComponent {
           onClick={this.handleTextButtonClick}
           inline
           size="small"
-          className={styles.button}
+          className={cs(styles.button, buttonCls)}
         >
           {status === 'counting' ? `重新发送(${countdown}s)` : '获取验证码'}
         </Button>

@@ -4,7 +4,6 @@ import { Toast, ListView } from 'antd-mobile';
 import cs from 'classnames';
 import qs from 'qs';
 import moment from 'moment';
-import isEqual from 'lodash/isEqual';
 import wxToken from '@/utils/wxToken';
 import NoData from '@/components/NoData';
 import Loading from '@/components/PageLoading';
@@ -94,15 +93,12 @@ class Bonus extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    // eslint-disable-next-line react/destructuring-assignment
-    if (!isEqual(nextProps.pagination, this.props.pagination)) {
-      const { dataSource } = this.state;
-      this.setState({
-        dataSource: dataSource.cloneWithRows(nextProps.bonusList),
-        isLoading: false,
-        hasMore: nextProps.bonusList.length < nextProps.pagination.total,
-      });
-    }
+    const { dataSource } = this.state;
+    this.setState({
+      dataSource: dataSource.cloneWithRows(nextProps.bonusList),
+      isLoading: false,
+      hasMore: nextProps.bonusList.length < nextProps.pagination.total,
+    });
   }
 
   onEndReached = () => {

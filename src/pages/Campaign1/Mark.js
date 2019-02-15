@@ -7,7 +7,7 @@ import cs from 'classnames';
 import qs from 'qs';
 import Loading from '@/components/PageLoading';
 import wxToken from '@/utils/wxToken';
-import wxJsTicket, {ticketClear} from '@/utils/wxJsTicket';
+import wxJsTicket from '@/utils/wxJsTicket';
 import Map from './Map';
 
 import { ReactComponent as Student } from '@/assets/icon/xuesheng.svg';
@@ -47,7 +47,7 @@ class Mark extends PureComponent {
       );
       return;
     }
-    wxToken();
+    wxToken(2);
   }
 
   componentDidMount() {
@@ -90,13 +90,12 @@ class Mark extends PureComponent {
         latitude,
         longitude,
       };
-      wxToken().then(() => {
+      wxToken(2).then(() => {
         dispatch({
           type: 'campaign1/mark',
           payload,
           callback: response => {
             if (response.code === 200) {
-              ticketClear();
               router.replace(`markSuccess?${qs.stringify({ type, activityId })}`);
             } else {
               Toast.info(response.message);

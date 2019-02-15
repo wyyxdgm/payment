@@ -31,7 +31,7 @@ import common from './style.less';
   loading: loading.effects['global/wxJsTicket'],
 }))
 class GuideForKG extends PureComponent {
-  state = { maskShow: false };
+  state = { maskShareShow: false };
 
   componentWillMount() {
     wxJsTicket().then(wx => {
@@ -49,13 +49,14 @@ class GuideForKG extends PureComponent {
     });
   }
 
-  maskHideHandle = () => {
-    this.setState({ maskShow: false });
+  // 分享遮罩关闭
+  handleMaskShareHide = () => {
+    this.setState({ maskShareShow: false });
   };
 
   // 分享按钮响应
   handleShareClick = () => {
-    this.setState({ maskShow: true });
+    this.setState({ maskShareShow: true });
   };
 
   handleRegLink = () => {
@@ -63,7 +64,7 @@ class GuideForKG extends PureComponent {
   };
 
   normal() {
-    const { maskShow } = this.state;
+    const { maskShareShow } = this.state;
     return (
       <div className={cs(common.guide)}>
         <img src={g1} alt="红包攻略" />
@@ -89,8 +90,10 @@ class GuideForKG extends PureComponent {
         <img src={g12} alt="红包攻略" />
         <img src={g13} alt="红包攻略" />
 
-        <Mask show={maskShow} onHide={this.maskHideHandle}>
-          <img src={sharedTip} className={common.maskShare} alt="右上角分享" />
+        <Mask show={maskShareShow} marginTop="0" onHide={this.handleMaskShareHide}>
+          <div className={common.maskShare}>
+            <img src={sharedTip} alt="右上角分享" />
+          </div>
         </Mask>
       </div>
     );

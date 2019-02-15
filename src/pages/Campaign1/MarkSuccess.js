@@ -15,15 +15,16 @@ import imgGzh from '@/assets/campaign1/gongzhonghao.png';
 import 'swiper/dist/css/swiper.css';
 
 import styles from './style.less';
+import common from '@/pages/Campaign1/style.less';
 
 @connect(({ campaign1, loading }) => ({
   bonusAmount: campaign1.bonusAmount,
   bonusList: campaign1.bonusList,
   kgName: campaign1.kgName,
-  loading: loading.effects['global/wxToken'] || loading.effects['global/wxJsTicket'],
+  loading: loading.effects['global/wxJsTicket'],
 }))
 class MarkSuccess extends PureComponent {
-  state = { maskShow: false, maskContent: 'share' };
+  state = { maskShareShow: false, maskMdmShow: false };
 
   componentWillMount() {
     const {
@@ -46,22 +47,28 @@ class MarkSuccess extends PureComponent {
     });
   }
 
-  maskHideHandle = () => {
-    this.setState({ maskShow: false });
+  // 分享遮罩关闭
+  handleMaskShareHide = () => {
+    this.setState({ maskShareShow: false });
+  };
+
+  // 面对面遮罩关闭
+  handleMaskMdmHide = () => {
+    this.setState({ maskMdmShow: false });
   };
 
   // 分享按钮响应
   handleShareClick = () => {
-    this.setState({ maskShow: true, maskContent: 'share' });
+    this.setState({ maskShareShow: true });
   };
 
   // 面对面撒红包
   handleMdmClick = () => {
-    this.setState({ maskShow: true, maskContent: 'mdm' });
+    this.setState({ maskMdmShow: true });
   };
 
   normal() {
-    const { maskShow, maskContent } = this.state;
+    const { maskShareShow, maskMdmShow } = this.state;
     const {
       location: { query },
     } = this.props;
@@ -83,19 +90,20 @@ class MarkSuccess extends PureComponent {
           </p>
         </div>
 
-        <Mask show={maskShow} onHide={this.maskHideHandle}>
-          {maskContent === 'share' && (
-            <img src={sharedTip} className={styles.maskShare} alt="右上角分享" />
-          )}
-          {maskContent === 'mdm' && (
-            <div className={styles.maskMdm}>
-              <QRCode
-                size={274}
-                margin={10}
-                text={`${host}/mform/campaign1/patriarch?type=1&activityId=${activityId}`}
-              />
-            </div>
-          )}
+        <Mask show={maskShareShow} marginTop="0" onHide={this.handleMaskShareHide}>
+          <div className={common.maskShare}>
+            <img src={sharedTip} alt="右上角分享" />
+          </div>
+        </Mask>
+
+        <Mask show={maskMdmShow} height="11.293rem" onHide={this.handleMaskMdmHide}>
+          <div className={styles.maskMdm}>
+            <QRCode
+              size={274}
+              margin={10}
+              text={`${host}/mform/campaign1/patriarch?type=1&activityId=${activityId}`}
+            />
+          </div>
         </Mask>
       </div>
     );

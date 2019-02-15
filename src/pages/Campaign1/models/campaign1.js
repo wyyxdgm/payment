@@ -1,3 +1,4 @@
+import { Toast } from 'antd-mobile';
 import { getBonus, bonusList, bonusListPage, mark, campaignStatus } from '@/services/campaign1';
 
 export function convertList(data) {
@@ -25,8 +26,12 @@ export default {
     // 领取红包
     *getBonus({ payload, callback }, { call }) {
       const response = yield call(getBonus, { ...payload });
-      if (callback) {
-        callback(response);
+      if (response.code || response.code === 0) {
+        if (callback) {
+          callback(response);
+        }
+      } else {
+        Toast.info('领取红包获取异常');
       }
     },
 
@@ -72,14 +77,20 @@ export default {
       const bonusAmount = data.reduce((prev, curr) => prev + curr.couponAmount, 0);
       return { ...state, bonusList: data, bonusAmount };
     },
+
     bonusListPageComplete(state, action) {
       const data = convertList(action.payload);
+      const currPagination = state.pagination;
+      // 如果加载之前数据，则清空红包列表数据
+      const clear = currPagination.current >= data.pagination.current;
+
       return {
         ...state,
-        bonusList: [...state.bonusList, ...data.list],
+        bonusList: clear ? data.list : [...state.bonusList, ...data.list],
         pagination: data.pagination,
       };
     },
+
     markComplete(state, action) {
       return { ...state, kgName: action.payload.toString().trim() };
     },

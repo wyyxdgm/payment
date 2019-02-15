@@ -1,6 +1,7 @@
-import { wxCheckCode, wxToken, wxJsTicket } from '@/services/global';
+import { wxCheckCode, wxToken, wxJsTicket, bindMobile, isMobileBind } from '@/services/global';
 import { Toast } from 'antd-mobile';
 import { getPageQuery } from '@/utils/utils';
+import { ticketClear } from '@/utils/wxJsTicket';
 
 export default {
   namespace: 'global',
@@ -11,6 +12,7 @@ export default {
       message: '',
     },
     wxToken: '',
+    mobileBound: false,
   },
 
   effects: {
@@ -47,12 +49,37 @@ export default {
     // 微信jsTicket，utils/wxJsTicket里使用
     *wxJsTicket({ payload, callback }, { call }) {
       const response = yield call(wxJsTicket, payload);
-      if (response.code === 200) {
+      if (response.code || response.code === 0) {
         if (callback) {
           callback(response);
         }
       } else {
         Toast.info('ticket获取异常');
+      }
+    },
+
+    // 绑定手机号
+    *bindMobile({ payload, callback }, { call }) {
+      const response = yield call(bindMobile, payload);
+      if (response.code || response.code === 0) {
+        if (callback) {
+          callback(response);
+        }
+      } else {
+        Toast.info('绑定手机号获取异常');
+      }
+    },
+
+    // 是否绑定手机号
+    *isMobileBind({ payload, callback }, { call, put }) {
+      const response = yield call(isMobileBind, payload);
+      if (response.code || response.code === 0) {
+        if (callback) {
+          callback(response);
+        }
+        yield put({ type: 'isMobileBindComplete', payload: response.data });
+      } else {
+        Toast.info('是否绑定手机号获取异常');
       }
     },
   },
@@ -63,6 +90,17 @@ export default {
     },
     wxTokenComplete(state, action) {
       return { ...state, wxToken: action.payload };
+    },
+    isMobileBindComplete(state, action) {
+      return { ...state, mobileBound: action.payload };
+    },
+  },
+
+  subscriptions: {
+    setup({ history }) {
+      history.listen(() => {
+        ticketClear();
+      });
     },
   },
 };

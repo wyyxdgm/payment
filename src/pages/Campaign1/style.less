@@ -83,7 +83,8 @@
   }
 }
 
-img.iconReg, .iconShared {
+img.iconReg,
+.iconShared {
   display: unset;
   width: 0.48rem;
   height: 0.48rem;
@@ -105,46 +106,40 @@ img.iconReg {
 
 // 遮罩分享图片
 .maskShare {
-  float: right;
-  width: 7rem !important;
-  margin-top: 2rem;
-  margin-right: 1rem;
-  pointer-events: none;
+  width: 100vw;
+  text-align: right;
+
+  img {
+    display: inline;
+    width: 7rem;
+    margin-top: 2rem;
+    margin-right: 1rem;
+    pointer-events: none;
+  }
 }
 
 // 遮罩手机号已领过
 .maskUsedPhone {
-  display: flex;
-  align-items: center;
-  height: 100%;
+  width: 100vw;
   padding: 0 20px;
 
   img {
     width: 100%;
-    margin-top: -3rem;
   }
 }
 
 .maskMdm {
   position: relative;
-  height: 100%;
-  margin: 0 0.4rem;
-  background: url(../../assets/campaign1/markMdm.png) no-repeat 0 1.2rem;
+  width: 7.6rem;
+  height: 11.493rem;
+  background: url(../../assets/campaign1/markMdm.png) no-repeat;
   background-size: 100%;
+  overflow: hidden;
 
   img {
-    position: absolute;
-
-    &:first-child {
-      top: 1.2rem;
-      width: 100%;
-    }
-
-    &:last-child {
-      top: 5.73rem;
-      left: 2.4rem;
-      width: 4.4rem;
-    }
+    display: block;
+    margin: 3.5rem auto 0;
+    width: 4rem;
   }
 }
 
