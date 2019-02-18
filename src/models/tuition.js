@@ -1,5 +1,15 @@
 import qs from 'qs';
-import { submit, detail, student, appId, openId, getFormInfo } from '@/services/pay';
+import { Toast } from 'antd-mobile';
+import {
+  submit,
+  detail,
+  student,
+  appId,
+  openId,
+  getFormInfo,
+  login,
+  availableBonus,
+} from '@/services/pay';
 import { jsonToFormData } from '@/utils/convert';
 
 export default {
@@ -11,6 +21,7 @@ export default {
     },
     staging: [],
     students: [],
+    bonus: [],
   },
 
   effects: {
@@ -64,6 +75,37 @@ export default {
         yield put({ type: 'studentComplete', payload: response });
       }
     },
+
+    // 手机验证码登录，获得支付专用的token
+    *login({ payload, callback }, { call }) {
+      const response = yield call(login, { ...payload });
+      if (response.code || response.code === 0) {
+        if (response.code === 200) {
+          sessionStorage.setItem('payTokenId', response.data);
+        }
+        if (callback) {
+          callback(response);
+        }
+      } else {
+        Toast.info('手机验证码登录异常');
+      }
+    },
+
+    // 根据分期方式得到匹配的优惠券列表
+    *availableBonus({ payload }, { call, put }) {
+      const response = yield call(availableBonus, { ...payload });
+      if (response.code || response.code === 0) {
+        if (response.code === 200) {
+          yield put({ type: 'availableBonusComplete', payload: response });
+        }
+      } else {
+        Toast.info('匹配的优惠券获取异常');
+      }
+    },
+
+    *clearBonus(action, { put }) {
+      yield put({ type: 'availableBonusComplete', payload: { data: [] } });
+    },
   },
 
   reducers: {
@@ -81,6 +123,10 @@ export default {
         label: item.name,
       }));
       return { ...state, students };
+    },
+    availableBonusComplete(state, action) {
+      const { data } = action.payload;
+      return { ...state, bonus: data };
     },
   },
 };

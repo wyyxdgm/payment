@@ -12,6 +12,17 @@ const stagingMap = {
   5: ['常规月付', '常规月付', '按月缴费'],
 };
 
+const stag = {
+  1: 12,
+  2: 24,
+  3: 6,
+  4: 3,
+};
+
+function sub(amount, installmentType, bonusAmount) {
+  return ((amount - bonusAmount) / stag[installmentType]).toFixed(2);
+}
+
 export default class Staging extends PureComponent {
   static propTypes = {
     data: PropTypes.arrayOf(
@@ -23,11 +34,13 @@ export default class Staging extends PureComponent {
         installmentType: PropTypes.number.isRequired,
       })
     ),
+    bonusAmount: PropTypes.number,
     onChange: PropTypes.func,
   };
 
   static defaultProps = {
     data: [],
+    bonusAmount: 0,
     onChange() {},
   };
 
@@ -48,14 +61,18 @@ export default class Staging extends PureComponent {
   }
 
   handleClick = item => () => {
-    const { onChange } = this.props;
-    this.setState({ id: item.id });
-    onChange(item);
+    const { id } = this.state;
+    if (id !== item.id) {
+      const { onChange } = this.props;
+      this.setState({ id: item.id });
+      onChange(item);
+    }
   };
 
   render() {
-    const { data } = this.props;
+    const { data, bonusAmount } = this.props;
     const { id } = this.state;
+
     return (
       <div className="swiper-container" ref={this.el}>
         <div className={styles.swiperWrapper}>
@@ -72,7 +89,10 @@ export default class Staging extends PureComponent {
                   <Fragment>
                     <del>￥{item.amount}元</del>
                     <p>
-                      <small>每月仅</small>￥{item.monthAmount.toFixed(2)}
+                      <small>每月仅</small>￥
+                      {item.id === id && item.installmentType !== 5
+                        ? sub(item.amount, item.installmentType, bonusAmount)
+                        : item.monthAmount.toFixed(2)}
                     </p>
                   </Fragment>
                 )}

@@ -36,3 +36,16 @@ export async function getFormInfo(payload) {
     body: payload,
   });
 }
+
+// 手机验证码登录
+export async function login(payload) {
+  return request(`/ajax/app/promotion/user/paymentLogin?${qs.stringify(payload)}`);
+}
+
+// 获得匹配分期id的优惠券列表
+export async function availableBonus(payload) {
+  const token = sessionStorage.getItem('payTokenId');
+  return request(`/ajax/app/promotion/coupon/queryUserCouponListByPayTypeId?${qs.stringify(payload)}`, {
+    headers: { token },
+  });
+}

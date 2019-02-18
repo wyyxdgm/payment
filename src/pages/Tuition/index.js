@@ -4,13 +4,18 @@ import { List, InputItem, WhiteSpace, Button, Toast, Flex, Icon } from 'antd-mob
 import { createForm } from 'rc-form';
 import qs from 'qs';
 import router from 'umi/router';
+import Debounce from 'lodash-decorators/debounce';
+import Bind from 'lodash-decorators/bind';
 import Loading from '@/components/PageLoading';
+import InputPhoneText from '@/components/InputPhoneText';
 import { isWeChat } from '@/utils/userAgent';
 import InputSelect from '@/components/InputSelect';
 import Staging from './Staging';
+import Bonus from './Bonus';
 import { ReactComponent as Student } from '@/assets/icon/xuesheng.svg';
 import { ReactComponent as Pay } from '@/assets/icon/jiaofeiren.svg';
 import { ReactComponent as Phone } from '@/assets/icon/shouji.svg';
+import { ReactComponent as Spacer } from '@/assets/icon/spacer.svg';
 
 import styles from './style.less';
 
@@ -18,6 +23,7 @@ import styles from './style.less';
   summary: tuition.summary,
   staging: tuition.staging,
   students: tuition.students,
+  bonus: tuition.bonus,
   submitting: loading.effects['tuition/submit'],
   detailLoading: loading.effects['tuition/detail'],
 }))
@@ -31,7 +37,13 @@ class Tuition extends PureComponent {
       this.defaultPayType = 1;
     }
     // 支付方法 1 支付宝，2 微信, 5 寺库
-    this.state = { payType: this.defaultPayType };
+    this.state = {
+      payType: this.defaultPayType,
+      bonusId: -1,
+      bonusName: '',
+      bonusAmount: 0,
+      bonusShow: false,
+    };
   }
 
   componentWillMount() {
@@ -73,6 +85,23 @@ class Tuition extends PureComponent {
     }
   }
 
+  // 根据分期ID得到红包列表
+  @Debounce(500)
+  getAvailableBonus() {
+    const { dispatch } = this.props;
+    const { payType } = this.state;
+    if (payType === 5) {
+      dispatch({
+        type: 'tuition/availableBonus',
+        payload: { payTypeId: this.typeId },
+      });
+    } else {
+      dispatch({
+        type: 'tuition/clearBonus',
+      });
+    }
+  }
+
   validate = () => {
     const {
       form: { validateFields },
@@ -87,7 +116,8 @@ class Tuition extends PureComponent {
       }
 
       const { payType } = this.state;
-      const {student, ...newValues} = values;
+      const { student, ...newValues } = values;
+      const couponId = this.state.bonusId; // eslint-disable-line
       const payload = {
         payType,
         ...newValues,
@@ -96,11 +126,14 @@ class Tuition extends PureComponent {
         typeId: this.typeId,
         classId: query.classId,
         className: query.className,
-        payPhone: values.payPhone.replace(/\s/g, ''),
+        payPhone: values.mobile.replace(/\s/g, ''),
+        couponId,
       };
 
       if (payType === 5) {
-        window.location.href = `https://m.hoogoo.cn/ajax/pay/pay/payment?${qs.stringify(payload)}`;
+        window.location.href = `https://m.hoogoo.cn/ajax/pay/pay/payment?${qs.stringify(
+          payload
+        )}`;
       } else {
         dispatch({
           type: 'tuition/submit',
@@ -118,10 +151,84 @@ class Tuition extends PureComponent {
     });
   };
 
+  // 缴费方式选择响应
   handleStagingChange = item => {
+    const payType = item.type === 2 ? 5 : this.defaultPayType;
     this.typeId = item.id;
-    this.setState({ payType: item.type === 2 ? 5 : this.defaultPayType });
+    this.setState({ payType, bonusId: -1, bonusAmount: 0 }, this.getAvailableBonus);
   };
+
+  // 发送验证码
+  handlePhoneTextClick = mobile => {
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'global/wxCheckCode',
+      payload: { mobile, type: 1 },
+      callback: response => {
+        if (response.code === 200) {
+          Toast.info(response.data, 3, null, false);
+        }
+      },
+    });
+  };
+
+  // 红包列表选择响应
+  handleBonusChange = data => {
+    this.setState({
+      bonusId: data.userCouponId,
+      bonusName: data.couponName,
+      bonusAmount: data.couponAmount,
+      bonusShow: false,
+    });
+  };
+
+  // 红包列表隐藏响应
+  handleBonusShow = () => {
+    const { bonus } = this.props;
+    if (bonus.length > 0) {
+      this.setState({ bonusShow: true });
+    }
+  };
+
+  // 红包列表隐藏响应
+  handleBonusHide = () => {
+    this.setState({ bonusShow: false });
+  };
+
+  // 检测短信验证码输入情况，如果验证码输入合法，则进行登录
+  @Bind()
+  @Debounce(200)
+  handleCodeKeyPress() {
+    const {
+      form: { getFieldValue },
+      dispatch,
+    } = this.props;
+
+    const checkCode = getFieldValue('checkCode');
+    if (this.checkCode === checkCode || checkCode.length !== 6) {
+      return;
+    }
+    this.checkCode = checkCode;
+
+    const mobile = (getFieldValue('mobile') || '').replace(/\s/g, '');
+    if (mobile.length < 11) {
+      return;
+    }
+
+    dispatch({
+      type: 'tuition/login',
+      payload: { mobile, checkCode },
+      callback: response => {
+        if (response.code === 200) {
+          this.getAvailableBonus();
+        } else {
+          // 验证码错误
+          Toast.info(response.message, 3, null, false);
+        }
+      },
+    });
+  }
 
   // 微信授权，会使页面重定向
   oauth(orderNo, typeId) {
@@ -198,11 +305,13 @@ class Tuition extends PureComponent {
   }
 
   normal() {
+    const { bonusShow, bonusId, bonusName, bonusAmount } = this.state;
     const {
       form: { getFieldProps, getFieldError },
       summary,
       staging,
       students,
+      bonus,
       submitting,
       location: { query },
     } = this.props;
@@ -224,7 +333,7 @@ class Tuition extends PureComponent {
               rules: [{ required: true, message: '请输入学生姓名' }],
             })}
           >
-            选择学生
+            选择已有学生
           </InputSelect>
           <InputItem
             placeholder="请输入缴费人姓名"
@@ -237,29 +346,48 @@ class Tuition extends PureComponent {
           >
             <Pay width="20" fill="#3F73DA" />
           </InputItem>
-          <InputItem
-            type="phone"
+          <InputPhoneText
             placeholder="请输入缴费人手机号"
-            labelNumber={2}
-            error={getFieldError('payPhone')}
-            {...getFieldProps('payPhone', {
+            icon={<Phone width="20" fill="#3F73DA" />}
+            buttonCls={styles.code}
+            onTextButtonClick={this.handlePhoneTextClick}
+            error={getFieldError('mobile')}
+            {...getFieldProps('mobile', {
               rules: [
                 { required: true, message: '请输入缴费人手机号' },
                 { len: 13, message: '请输入正确的手机号' },
               ],
             })}
+          />
+          <InputItem
+            type="tel"
+            placeholder="请输入验证码"
+            labelNumber={2}
+            maxLength="6"
+            pattern="[0-9]{6}"
+            clear
+            onInput={this.handleCodeKeyPress}
+            error={getFieldError('checkCode')}
+            {...getFieldProps('checkCode', {
+              rules: [{ required: true, message: '请输入验证码' }],
+            })}
           >
-            <Phone width="20" fill="#3F73DA" />
+            <Spacer />
           </InputItem>
         </List>
         <WhiteSpace size="lg" />
         缴费方式
         <WhiteSpace size="lg" />
         <div className={styles.staging}>
-          <Staging data={staging} onChange={this.handleStagingChange} />
-          <Flex justify="between" className={styles.coupon}>
+          <Staging data={staging} onChange={this.handleStagingChange} bonusAmount={bonusAmount} />
+          <Flex justify="between" className={styles.coupon} onClick={this.handleBonusShow}>
             <div>使用优惠券</div>
-            <div><span>暂无可用优惠券</span><Icon type="right" /></div>
+            <div>
+              {bonusId === -1 && bonus.length === 0 && <span>暂无可用优惠券</span>}
+              {bonusId === -1 && bonus.length > 0 && <span style={{ color: '#eb5d35' }}>{bonus.length} 张优惠券可使用</span>}
+              {bonusId !== -1 && <span style={{ color: '#eb5d35' }}>{bonusName}</span>}
+              <Icon type="right" />
+            </div>
           </Flex>
         </div>
         <WhiteSpace />
@@ -268,6 +396,12 @@ class Tuition extends PureComponent {
             立即支付
           </Button>
         </div>
+        <Bonus
+          data={bonus}
+          show={bonusShow}
+          onChange={this.handleBonusChange}
+          onHide={this.handleBonusHide}
+        />
       </div>
     );
   }
