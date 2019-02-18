@@ -46,8 +46,12 @@ export default {
     // 红包列表 有分页功能
     *bonusListPage({ payload }, { call, put }) {
       const response = yield call(bonusListPage, { ...payload });
-      if (response.code === 200) {
-        yield put({ type: 'bonusListPageComplete', payload: response.data });
+      if (response.code || response.code === 0) {
+        if (response.code === 200) {
+          yield put({ type: 'bonusListPageComplete', payload: response.data });
+        } else {
+          Toast.info(response.message);
+        }
       }
     },
 

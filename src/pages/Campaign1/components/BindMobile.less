@@ -1,0 +1,78 @@
+@import '~antd-mobile/es/style/mixins/hairline';
+
+// 绑定手机号弹出层
+html .bindTel {
+  width: 7.6rem;
+  max-width: 285px;
+  height: 7.36rem;
+  max-height: 235px;
+  padding: 23% 20px 0;
+  background: url(../../../assets/campaign1/bindTelBg.png) no-repeat;
+  background-size: 100%;
+
+  :global {
+    .am-list-body {
+      background-color: unset;
+      > div {
+        &:not(:last-child) {
+          .hairline-remove('bottom');
+          border: 2px solid rgba(255, 128, 51, 1);
+        }
+        margin: 10px 0;
+        padding: 0 10px;
+        border: 2px solid rgba(255, 128, 51, 1);
+        border-radius: 5px;
+        background-color: #fff;
+      }
+    }
+    .am-list-item {
+      min-height: 32px;
+      background-color: unset;
+      &.am-input-error {
+        .am-input-error-extra {
+          width: 15px;
+          height: 15px;
+          background-size: 15px auto;
+        }
+      }
+      .am-input-clear {
+        width: 15px;
+        height: 15px;
+        background-size: 14px auto;
+      }
+    }
+    .am-input-item {
+      height: 32px;
+      .am-input-control {
+        font-size: 12px;
+        input {
+          font-size: 12px !important;
+        }
+      }
+    }
+  }
+
+  .code {
+    padding: 0 5px;
+    font-size: 12px;
+    color: #f82e2c;
+  }
+
+  .btnArea {
+    margin-top: 12px;
+    padding: 9px 0;
+    :global {
+      .am-button {
+        .hairline-remove('all');
+        height: 31px;
+        margin: auto;
+        font-size: 15px;
+        line-height: 31px;
+        color: #f82e2c;
+        background: linear-gradient(0deg, rgba(255, 234, 148, 1), rgba(253, 209, 49, 1));
+        border: 1px solid rgba(253, 234, 74, 1);
+        border-radius: 5px;
+      }
+    }
+  }
+}

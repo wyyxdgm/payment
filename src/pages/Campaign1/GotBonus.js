@@ -1,18 +1,17 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Button, WhiteSpace, Toast, InputItem, List } from 'antd-mobile';
+import { Button, WhiteSpace, Toast } from 'antd-mobile';
 import cs from 'classnames';
 import qs from 'qs';
 import router from 'umi/router';
 import Link from 'umi/link';
-import { createForm } from 'rc-form';
 import Mask from '@/components/Mask';
 import Loading from '@/components/PageLoading';
-import InputPhoneText from '@/components/InputPhoneText';
 import wxJsTicket from '@/utils/wxJsTicket';
 import wxToken from '@/utils/wxToken';
 
 import BonusSwipe from './BonusSwip';
+import BindMobile from './components/BindMobile';
 import sharedLinkIcon from '@/assets/campaign1/sharedLinkIcon.png';
 import sharedTip from '@/assets/campaign1/shareTip.png';
 import imgGuide from '@/assets/campaign1/bonusGuide.png';
@@ -31,9 +30,7 @@ import styles from './GotBonus.less';
     loading.effects['global/wxJsTicket'] ||
     loading.effects['campaign1/bonusList'] ||
     loading.effects['global/isMobileBind'],
-  bindTelLoading: loading.effects['global/bindMobile'],
 }))
-@createForm()
 class GotBonus extends PureComponent {
   state = { maskShow: false, bindMaskShow: false };
 
@@ -77,47 +74,24 @@ class GotBonus extends PureComponent {
     }
   }
 
-  // 关联手机号
-  validate = () => {
-    const {
-      location: { query },
-      form: { validateFields },
-      dispatch,
-    } = this.props;
-
-    const { activityId, code } = query;
-
-    validateFields((error, values) => {
-      if (error) {
-        Toast.info(Object.values(error)[0].errors[0].message, 3, null, false);
-        return;
-      }
-      const payload = {
-        ...values,
-        mobile: values.mobile.replace(/\s/g, ''),
-        type: 1,
-      };
-      wxToken().then(() => {
-        dispatch({
-          type: 'global/bindMobile',
-          payload,
-          callback: response => {
-            if (response.code !== 200) {
-              Toast.info(response.message, 3, null, false);
-            } else {
-              router.push(`bonus?activityId=${activityId}&code=${code}`);
-            }
-          },
-        });
-      });
-    });
-  };
-
   maskHideHandle = () => {
     this.setState({ maskShow: false });
   };
 
-  handleBindMaskHide = fromChildren => {
+  // 关联手机号结果响应
+  handleBind = error => {
+    const {
+      location: { query },
+    } = this.props;
+
+    const { activityId, code } = query;
+    if (!error) {
+      router.push(`bonus?activityId=${activityId}&code=${code}`);
+    }
+  };
+
+  // 绑定手机组建消失响应
+  handleBindHide = fromChildren => {
     if (!fromChildren) {
       this.setState({ bindMaskShow: false });
     }
@@ -142,29 +116,12 @@ class GotBonus extends PureComponent {
     }
   };
 
-  // 发送验证码
-  handlePhoneTextClick = mobile => {
-    const { dispatch } = this.props;
-
-    dispatch({
-      type: 'global/wxCheckCode',
-      payload: { mobile, type: 2 },
-      callback: response => {
-        if (response.code === 200) {
-          Toast.info(response.data, 3, null, false);
-        }
-      },
-    });
-  };
-
   normal() {
     const { maskShow, bindMaskShow } = this.state;
     const {
-      form: { getFieldError, getFieldProps },
       location: { query },
       bonusAmount,
       bonusList,
-      bindTelLoading,
     } = this.props;
     const { activityId } = query;
 
@@ -198,44 +155,7 @@ class GotBonus extends PureComponent {
           </div>
         </Mask>
 
-        <Mask show={bindMaskShow} height="7.36rem" showClose onHide={this.handleBindMaskHide}>
-          <div className={styles.bindTel}>
-            <List>
-              <InputPhoneText
-                placeholder="请输入手机号"
-                buttonCls={styles.code}
-                onTextButtonClick={this.handlePhoneTextClick}
-                error={getFieldError('mobile')}
-                {...getFieldProps('mobile', {
-                  rules: [
-                    { required: true, message: '请输入手机号' },
-                    { len: 13, message: '请输入正确的手机号' },
-                  ],
-                })}
-              />
-              <div>
-                <InputItem
-                  type="tel"
-                  placeholder="请输入验证码"
-                  labelNumber={2}
-                  maxLength="6"
-                  pattern="[0-9]{6}"
-                  size=""
-                  clear
-                  error={getFieldError('checkCode')}
-                  {...getFieldProps('checkCode', {
-                    rules: [{ required: true, message: '请输入手机验证码' }],
-                  })}
-                />
-              </div>
-            </List>
-            <div className={styles.btnArea}>
-              <Button onClick={this.validate} loading={bindTelLoading} disabled={bindTelLoading}>
-                确定
-              </Button>
-            </div>
-          </div>
-        </Mask>
+        <BindMobile show={bindMaskShow} onBind={this.handleBind} onHide={this.handleBindHide} />
       </div>
     );
   }

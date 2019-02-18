@@ -59,11 +59,14 @@ export default {
     },
 
     // 绑定手机号
-    *bindMobile({ payload, callback }, { call }) {
+    *bindMobile({ payload, callback }, { call, put }) {
       const response = yield call(bindMobile, payload);
       if (response.code || response.code === 0) {
         if (callback) {
           callback(response);
+        }
+        if (response.code === 200) {
+          yield put({ type: 'isMobileBindComplete', payload: response.data });
         }
       } else {
         Toast.info('绑定手机号获取异常');
