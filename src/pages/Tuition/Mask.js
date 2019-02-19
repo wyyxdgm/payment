@@ -16,6 +16,7 @@ export default class extends PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.show) {
       document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     }
   }
 
@@ -29,7 +30,11 @@ export default class extends PureComponent {
     return (
       <div>
         {show && (
-          <div className={styles.mask} onClick={this.handleClick}>
+          <div
+            className={styles.mask}
+            onClick={this.handleClick}
+            style={{ height: `${document.documentElement.scrollHeight}px` }}
+          >
             {children}
           </div>
         )}
