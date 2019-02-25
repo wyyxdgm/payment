@@ -189,9 +189,7 @@ class Payment extends PureComponent {
             <s>￥{feeTotal.toFixed(2)}</s>
           </dd>
           <dd className={styles.footer}>
-            <span>
-              首付款金额<small>(总金额*10%)</small>
-            </span>
+            <span>首付款金额</span>
             <span className={styles.rate}>￥{firstAmount.toFixed(2)}</span>
           </dd>
         </dl>
