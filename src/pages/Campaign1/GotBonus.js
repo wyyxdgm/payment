@@ -62,12 +62,14 @@ class GotBonus extends PureComponent {
       });
       wxJsTicket().then(wx => {
         const host = window.location.origin;
-        wx.onMenuShareAppMessage({
+        const share = {
           title: '分享出来就是让你戳进来领红包的',
           desc: '传递新年新财气，和谷春节送大礼',
           link: `${host}/mform/campaign1/patriarch?activityId=${activityId}`,
           imgUrl: host + sharedLinkIcon,
-        });
+        };
+        wx.onMenuShareAppMessage(share);
+        wx.onMenuShareTimeline(share);
       });
     } else {
       Toast.info('请指定一个优惠活动');
@@ -129,7 +131,7 @@ class GotBonus extends PureComponent {
       <div className={cs(styles.container)}>
         <div className={styles.amount}>{bonusAmount}</div>
         <Link className={styles.link} to={`guide-for-ph?${qs.stringify({ activityId })}`}>
-          *使用红包攻略 GO&gt;
+          *使用红包说明
         </Link>
         <BonusSwipe data={bonusList} />
         <div className={styles.guide}>

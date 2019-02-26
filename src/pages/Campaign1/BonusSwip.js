@@ -1,8 +1,10 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import cs from 'classnames';
-import 'swiper/dist/css/swiper.css';
+import router from 'umi/router';
+import {getPageQuery} from '@/utils/utils';
 
+import 'swiper/dist/css/swiper.css';
 import styles from './GotBonus.less';
 
 export default class BonusSwip extends PureComponent {
@@ -25,13 +27,18 @@ export default class BonusSwip extends PureComponent {
 
   swipper = null;
 
+  handleDLClick = () => {
+    const {activityId, code} = getPageQuery();
+    router.push(`bonus?activityId=${activityId}&code=${code}`);
+  };
+
   render() {
     const { data } = this.props;
     return (
       <div className={cs(styles.bonus, 'swiper-container')} ref={this.el}>
         <div className="swiper-wrapper">
           {data.map(item => (
-            <dl className="swiper-slide" key={item.userCouponId}>
+            <dl className="swiper-slide" key={item.userCouponId} onClick={this.handleDLClick}>
               <dt>{item.useScope}期可用</dt>
               <dd>
                 {item.couponAmount}

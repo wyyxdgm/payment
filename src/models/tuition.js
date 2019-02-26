@@ -110,11 +110,11 @@ export default {
 
   reducers: {
     detailComplete(state, action) {
-      const { data, types } = action.payload;
+      const { data, types, gradeName } = action.payload;
       const { name } = data;
       types.sort((a, b) => b.type - a.type);
 
-      return { ...state, summary: { name }, staging: [...types] };
+      return { ...state, summary: { name, gradeName }, staging: [...types] };
     },
     studentComplete(state, action) {
       const { data } = action.payload;

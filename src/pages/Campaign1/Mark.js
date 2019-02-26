@@ -194,7 +194,7 @@ class Mark extends PureComponent {
         <WhiteSpace />
         <div className={styles.btnArea}>
           <Button onClick={this.validate} loading={submitLoading} disabled={submitLoading}>
-            <span>立即标记</span>
+            <span>立即定制</span>
           </Button>
         </div>
         <WhiteSpace size="xl" />

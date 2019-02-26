@@ -40,12 +40,14 @@ class GuideForKG extends PureComponent {
       } = this.props;
       const { activityId } = query;
       const host = window.location.origin;
-      wx.onMenuShareAppMessage({
+      const share = {
         title: '分享出来就是让你戳进来领红包的',
         desc: '传递新年新财气，和谷春节送大礼',
-        link: `${host}/mform/campaign1/patriarch?${qs.stringify({ type: 1, activityId })}`,
+        link: `${host}/mform/campaign1/patriarch?activityId=${activityId}`,
         imgUrl: host + sharedLinkIcon,
-      });
+      };
+      wx.onMenuShareAppMessage(share);
+      wx.onMenuShareTimeline(share);
     });
   }
 

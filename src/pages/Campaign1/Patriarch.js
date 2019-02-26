@@ -10,7 +10,6 @@ import wxJsTicket from '@/utils/wxJsTicket';
 import wxToken from '@/utils/wxToken';
 
 import { ReactComponent as Shared } from '@/assets/campaign1/icon/shared.svg';
-import gameRule from '@/assets/campaign1/gameRule.png';
 import sharedTip from '@/assets/campaign1/shareTip.png';
 import usedPhone from '@/assets/campaign1/used.png';
 import sharedLinkIcon from '@/assets/campaign1/sharedLinkIcon.png';
@@ -49,12 +48,14 @@ class Patriarch extends PureComponent {
       const { activityId } = query;
       wxJsTicket().then(wx => {
         const host = window.location.origin;
-        wx.onMenuShareAppMessage({
+        const share = {
           title: '分享出来就是让你戳进来领红包的',
           desc: '传递新年新财气，和谷春节送大礼',
           link: `${host}/mform/campaign1/patriarch?activityId=${activityId}`,
           imgUrl: host + sharedLinkIcon,
-        });
+        };
+        wx.onMenuShareAppMessage(share);
+        wx.onMenuShareTimeline(share);
       });
 
       wxToken().then(() => {
@@ -133,7 +134,17 @@ class Patriarch extends PureComponent {
           </Button>
         </div>
         <div className={styles.gameRule}>
-          <img src={gameRule} alt="红包规则" />
+          <div className={styles.inner}>
+            <h2>红包规则</h2>
+            <ol>
+              <li>领取成功后，请到和谷学费宝微信公众号的菜单栏中点击「我的」-【我的红包】中查看。</li>
+              <li>红包可在支付学费时使用（所在幼儿园需提前开通和谷学费宝平台)。</li>
+              <li>红包不与园所其他优惠叠加使用。</li>
+              <li>红包不能提现，不能转赠他人，不能为他人领取。</li>
+              <li>该活动最终解释权由和谷共创所有。</li>
+              <li>如有其它疑问请咨询和谷客服：<a href="tel://4008109855">400-810-9855</a></li>
+            </ol>
+          </div>
         </div>
         <Mask show={maskShareShow} marginTop="0" onHide={this.handleMaskShare}>
           <div className={common.maskShare}>

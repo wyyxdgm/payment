@@ -16,6 +16,7 @@ import 'swiper/dist/css/swiper.css';
 
 import styles from './style.less';
 import common from '@/pages/Campaign1/style.less';
+import { ReactComponent as Shared } from '@/assets/campaign1/icon/shared.svg';
 
 @connect(({ campaign1, loading }) => ({
   bonusAmount: campaign1.bonusAmount,
@@ -36,14 +37,16 @@ class MarkSuccess extends PureComponent {
     const host = window.location.origin;
     wxJsTicket().then(wx => {
       const isContained = /(幼儿园|幼稚园)/.test(kgName);
-      wx.onMenuShareAppMessage({
+      const share = {
         title: kgName
           ? `${kgName}${isContained ? '' : '幼儿园'}发福利，猪年给你送豪礼`
           : '分享出来就是让你戳进来领红包的',
         desc: '传递新年新财气，和谷春节送大礼',
-        link: `${host}/mform/campaign1/patriarch?${qs.stringify({ type: 1, activityId })}`,
+        link: `${host}/mform/campaign1/patriarch?${activityId}`,
         imgUrl: host + sharedLinkIcon,
-      });
+      };
+      wx.onMenuShareAppMessage(share);
+      wx.onMenuShareTimeline(share);
     });
   }
 
@@ -78,7 +81,10 @@ class MarkSuccess extends PureComponent {
     return (
       <div className={cs(styles.container, styles.markSuccess)}>
         <div className={styles.btnArea}>
-          <Button onClick={this.handleShareClick}>分享家长领红包</Button>
+          <Button onClick={this.handleShareClick}>
+            <Shared fill="#9B1E23" className={common.iconShared} />
+            <span>分享家长领红包</span>
+          </Button>
           <WhiteSpace size="xl" />
           <Button onClick={this.handleMdmClick}>面对面撒红包</Button>
         </div>

@@ -2,8 +2,6 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import cs from 'classnames';
 import { Button } from 'antd-mobile';
-import qs from 'qs';
-import LazyLoad from 'react-lazy-load';
 import Mask from '@/components/Mask';
 import Loading from '@/components/PageLoading';
 import wxJsTicket from '@/utils/wxJsTicket';
@@ -39,12 +37,14 @@ class GuideForPH extends PureComponent {
       } = this.props;
       const { activityId } = query;
       const host = window.location.origin;
-      wx.onMenuShareAppMessage({
+      const share = {
         title: '入驻和谷学费宝，你招生我送钱',
         desc: '稳固生源，资金安全，对账简单，园所升级不再难。',
-        link: `${host}/mform/campaign1/guide-for-kg?${qs.stringify({ type: 2, activityId })}`,
+        link: `${host}/mform/campaign1/guide-for-kg?activityId=${activityId}`,
         imgUrl: host + sharedLinkIconKg,
-      });
+      };
+      wx.onMenuShareAppMessage(share);
+      wx.onMenuShareTimeline(share);
     });
   }
 

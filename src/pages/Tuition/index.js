@@ -131,9 +131,7 @@ class Tuition extends PureComponent {
       };
 
       if (payType === 5) {
-        window.location.href = `https://m.hoogoo.cn/ajax/pay/pay/payment?${qs.stringify(
-          payload
-        )}`;
+        window.location.href = `https://m.hoogoo.cn/ajax/pay/pay/payment?${qs.stringify(payload)}`;
       } else {
         dispatch({
           type: 'tuition/submit',
@@ -315,11 +313,11 @@ class Tuition extends PureComponent {
       submitting,
       location: { query },
     } = this.props;
-    const { name } = summary;
+    const { name, gradeName } = summary;
 
     return (
       <div className={styles.container}>
-        <div className={styles.title}>{`${name} - ${query.className}`}</div>
+        <div className={styles.title}>{`${name + gradeName} - ${query.className}`}</div>
         <WhiteSpace size="lg" />
         学生信息
         <WhiteSpace size="lg" />
@@ -384,7 +382,9 @@ class Tuition extends PureComponent {
             <div>使用优惠券</div>
             <div>
               {bonusId === -1 && bonus.length === 0 && <span>暂无可用优惠券</span>}
-              {bonusId === -1 && bonus.length > 0 && <span style={{ color: '#eb5d35' }}>{bonus.length} 张优惠券可使用</span>}
+              {bonusId === -1 && bonus.length > 0 && (
+                <span style={{ color: '#eb5d35' }}>{bonus.length} 张优惠券可使用</span>
+              )}
               {bonusId !== -1 && <span style={{ color: '#eb5d35' }}>{bonusName}</span>}
               <Icon type="right" />
             </div>
