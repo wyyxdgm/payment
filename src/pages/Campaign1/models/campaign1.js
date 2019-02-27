@@ -24,9 +24,12 @@ export default {
 
   effects: {
     // 领取红包
-    *getBonus({ payload, callback }, { call }) {
+    *getBonus({ payload, callback }, { call, put }) {
       const response = yield call(getBonus, { ...payload });
       if (response.code || response.code === 0) {
+        if (response.code === 200) {
+          yield put({ type: 'bonusListComplete', payload: response.data });
+        }
         if (callback) {
           callback(response);
         }
