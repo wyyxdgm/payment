@@ -23,7 +23,7 @@ import styles from './GotBonus.less';
 
 @connect(({ campaign1, global, loading }) => ({
   bonusAmount: campaign1.bonusAmount,
-  bonusList: campaign1.bonusList,
+  bonusList: campaign1.gotBonusList,
   mobileBound: global.mobileBound,
   loading:
     loading.effects['global/wxToken'] ||
@@ -131,7 +131,7 @@ class GotBonus extends PureComponent {
       <div className={cs(styles.container)}>
         <div className={styles.amount}>{bonusAmount}</div>
         <Link className={styles.link} to={`guide-for-ph?${qs.stringify({ activityId })}`}>
-          *使用红包说明
+          *使用红包说明 GO&gt;
         </Link>
         <BonusSwipe data={bonusList} />
         <div className={styles.guide}>

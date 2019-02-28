@@ -18,6 +18,7 @@ export default {
   state: {
     bonusAmount: 0, // 红包总额
     bonusList: [], // 红包列表
+    gotBonusList: [], // 领取到的红包
     pagination: {}, // 红包页
     kgName: '', // 幼儿园名称
   },
@@ -82,7 +83,7 @@ export default {
     bonusListComplete(state, action) {
       const data = action.payload;
       const bonusAmount = data.reduce((prev, curr) => prev + curr.couponAmount, 0);
-      return { ...state, bonusList: data, bonusAmount };
+      return { ...state, gotBonusList: data, bonusAmount };
     },
 
     bonusListPageComplete(state, action) {

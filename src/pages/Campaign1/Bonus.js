@@ -42,7 +42,9 @@ const row = mobileBound => (rowData, sectionID, rowID) => {
             元起可用
           </p>
           <p>
-            {formatDate(rowData.startTime)}～{formatDate(rowData.endTime)}
+            {rowData.validTimeType === 1
+              ? `${formatDate(rowData.startTime)}～${formatDate(rowData.endTime)}`
+              : '长期有效'}
           </p>
         </div>
       </dd>
@@ -129,12 +131,12 @@ class Bonus extends PureComponent {
   };
 
   lvFooter = () => {
-    const { isLoading, hasMore } = this.state;
+    const { isLoading, hasMore, dataSource } = this.state;
     return (
       <div style={{ paddingTop: 15, textAlign: 'center' }}>
         {isLoading && '加载中...'}
-        {!isLoading && hasMore && '加载更多'}
-        {!isLoading && !hasMore && '已经到底了'}
+        {dataSource.getRowCount() > 0 && !isLoading && hasMore && '加载更多'}
+        {dataSource.getRowCount() > 0 && !isLoading && !hasMore && '已经到底了'}
       </div>
     );
   };

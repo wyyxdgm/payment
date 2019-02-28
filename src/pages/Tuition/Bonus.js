@@ -34,7 +34,9 @@ const row = onChange => (rowData, sectionID, rowID) => {
             元起可用
           </p>
           <p>
-            {formatDate(rowData.startTime)}～{formatDate(rowData.endTime)}
+            {rowData.validTimeType === 1
+              ? `${formatDate(rowData.startTime)}～${formatDate(rowData.endTime)}`
+              : '长期有效'}
           </p>
         </div>
       </dd>
