@@ -28,7 +28,6 @@ import styles from './GotBonus.less';
   loading:
     loading.effects['global/wxToken'] ||
     loading.effects['global/wxJsTicket'] ||
-    loading.effects['campaign1/bonusList'] ||
     loading.effects['global/isMobileBind'],
 }))
 class GotBonus extends PureComponent {
@@ -56,7 +55,7 @@ class GotBonus extends PureComponent {
       );
     } else if (activityId) {
       wxToken().then(() => {
-        dispatch({ type: 'campaign1/bonusList', payload: { activityId } });
+        // dispatch({ type: 'campaign1/bonusList', payload: { activityId } });
         // 判断当前微信是否绑定手机号
         dispatch({ type: 'global/isMobileBind', payload: { type: 1 } });
       });

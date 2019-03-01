@@ -90,7 +90,7 @@ class Patriarch extends PureComponent {
         payload,
         callback: response => {
           if (response.code === 200) {
-            router.replace(`got-bonus?activityId=${activityId}&code=${code}`);
+            router.push(`got-bonus?activityId=${activityId}&code=${code}`);
           } else {
             Toast.info(response.message);
           }
