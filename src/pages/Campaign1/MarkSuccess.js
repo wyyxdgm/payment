@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Button, WhiteSpace } from 'antd-mobile';
 import cs from 'classnames';
-import qs from 'qs';
 
 import QRCode from '@/components/QRCode';
 import Mask from '@/components/Mask';
@@ -42,7 +41,7 @@ class MarkSuccess extends PureComponent {
           ? `${kgName}${isContained ? '' : '幼儿园'}发福利，猪年给你送豪礼`
           : '分享出来就是让你戳进来领红包的',
         desc: '传递新年新财气，和谷春节送大礼',
-        link: `${host}/mform/campaign1/patriarch?${activityId}`,
+        link: `${host}/mform/campaign1/patriarch?activityId=${activityId}`,
         imgUrl: host + sharedLinkIcon,
       };
       wx.onMenuShareAppMessage(share);
