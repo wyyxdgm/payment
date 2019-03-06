@@ -18,6 +18,7 @@ export default {
   state: {
     summary: {
       name: '',
+      gradeId: 0,
     },
     staging: [],
     students: [],
@@ -26,8 +27,9 @@ export default {
 
   effects: {
     // 支付提交
-    *submit({ payload, callback }, { call }) {
-      const formData = jsonToFormData({ ...payload });
+    *submit({ payload, callback }, { call, select }) {
+      const gradeId = yield select(({tuition}) => tuition.summary.gradeId);
+      const formData = jsonToFormData({ ...payload, gradeId });
       const response = yield call(submit, formData);
       if (callback) {
         callback(response);
@@ -111,10 +113,10 @@ export default {
   reducers: {
     detailComplete(state, action) {
       const { data, types, gradeName } = action.payload;
-      const { name } = data;
+      const { name, gradeId } = data;
       types.sort((a, b) => b.type - a.type);
 
-      return { ...state, summary: { name, gradeName }, staging: [...types] };
+      return { ...state, summary: { name, gradeName, gradeId }, staging: [...types] };
     },
     studentComplete(state, action) {
       const { data } = action.payload;
