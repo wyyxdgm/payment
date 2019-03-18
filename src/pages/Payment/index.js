@@ -25,7 +25,7 @@ class Payment extends PureComponent {
   constructor(props) {
     super(props);
 
-    const payType = isWeChat() ? 2 : 1;
+    const payType = isWeChat() ? 7 : 6;
     // 支付方法 1 支付宝，2 微信, 5 寺库
     this.state = { payType };
     this.typeId = 0;
@@ -96,10 +96,10 @@ class Payment extends PureComponent {
           payPhone: values.payPhone.replace(/\s/g, ''),
         },
         callback: responseData => {
-          if (payType === 1) {
+          if (payType === 6) {
             document.body.innerHTML = responseData;
             document.forms[0].submit();
-          } else if (payType === 2) {
+          } else if (payType === 7) {
             this.oauth(responseData, typeId);
           }
         },
