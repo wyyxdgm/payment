@@ -15,6 +15,7 @@ import { ReactComponent as Phone } from '@/assets/icon/shouji.svg';
 import { ReactComponent as Kg } from '@/assets/icon/yuansuo.svg';
 import { ReactComponent as Address } from '@/assets/icon/dizhi.svg';
 import { ReactComponent as Pos } from '@/assets/icon/pos.svg';
+import sharedLinkIconKg from '@/assets/campaign1/sharedLinkIconKg.png';
 
 import styles from './style.less';
 
@@ -48,6 +49,19 @@ class Mark extends PureComponent {
       return;
     }
     wxToken(2);
+
+    const host = window.location.origin;
+    const { activityId } = query;
+    wxJsTicket().then(wx => {
+      const share = {
+        title: '你有一个制定专属红包的特权,速领～',
+        desc: '制定专属红包，让家长领个痛快！',
+        link: `${host}/mform/campaign1/mark?activityId=${activityId}`,
+        imgUrl: host + sharedLinkIconKg,
+      };
+      wx.onMenuShareAppMessage(share);
+      wx.onMenuShareTimeline(share);
+    });
   }
 
   componentDidMount() {
