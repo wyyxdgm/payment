@@ -100,7 +100,9 @@ class Payment extends PureComponent {
             document.body.innerHTML = responseData;
             document.forms[0].submit();
           } else if (payType === 7) {
-            this.oauth(responseData, typeId);
+            // this.oauth(responseData, typeId); 微信认证唤醒支付
+            document.body.innerHTML = responseData;
+            document.forms[0].submit();
           }
         },
       });
