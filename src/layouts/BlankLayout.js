@@ -91,7 +91,7 @@ class BasicLayout extends React.PureComponent {
     const currRouterData = this.matchParamsPath(pathname, breadcrumbNameMap);
 
     if (!currRouterData) {
-      return '和谷学费宝';
+      return '学费宝';
     }
     const pageName = currRouterData.name;
 
