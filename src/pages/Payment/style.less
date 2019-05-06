@@ -62,7 +62,6 @@
     padding-top: 20px;
     color: #171717;
     font-size: 18px;
-    text-align: center;
     &:after {
       content: '';
       display: block;
@@ -101,7 +100,7 @@
 }
 
 .btnArea {
-  margin: 0 -15px;
+  margin: 20px -15px 0;
   padding: 20px;
   background-color: #fff;
 
@@ -125,4 +124,85 @@
 
 .btnPrice {
   font-size: 20px;
+}
+
+.period {
+  border-radius: 5px;
+  background-color: #fff;
+  padding: 8px;
+
+  h2 {
+    margin: 0 10px 15px;
+    padding-top: 20px;
+    color: #171717;
+    font-size: 18px;
+    text-align: center;
+    &:after {
+      content: '';
+      display: block;
+      height: 1px;
+      margin: 20px 0 10px;
+      background-color: #e4e4e4;
+    }
+  }
+
+  .swiperWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-items: center;
+  }
+
+  dl {
+    flex: 0 1 calc(50% - 10px);
+    min-height: 108px;
+    margin: 5px;
+    border: 1px solid #e4e4e4;
+    border-radius: 5px;
+    background-color: #fff;
+  }
+  dt {
+    background-color: #e4e4e4;
+    font-size: 12px;
+    color: #fff;
+    text-align: center;
+    font-weight: normal;
+    line-height: 20px;
+  }
+  dd {
+    text-align: center;
+    margin-bottom: unset;
+    padding: 10px 0;
+    color: #d7d7d7;
+
+    p {
+      margin-bottom: 0;
+      font-size: 12px;
+      &:last-child {
+        font-size: 18px;
+      }
+    }
+    del {
+      display: block;
+      min-height: 16px;
+      font-size: 12px;
+    }
+    small {
+      font-size: 70%;
+    }
+  }
+
+  .checked {
+    border-color: #ed775a !important;
+    box-shadow: #ed775a;
+    dt {
+      background-color: #ed775a;
+      border-radius: 5px 5px 0 0;
+    }
+    p {
+      color: #171717;
+      &:last-child {
+        color: #ed775a;
+      }
+    }
+  }
 }

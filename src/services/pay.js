@@ -13,8 +13,16 @@ export async function detail(payload) {
   return request(`/ajax/form/form/detail?${qs.stringify(payload)}`);
 }
 
+export async function installments() {
+  return request(`/ajax/pay/installmentParam/list`);
+}
+
 export async function student(payload) {
   return request(`/ajax/people/Student/query?${qs.stringify(payload)}`);
+}
+
+export async function kgName({ kindergartenId }) {
+  return request(`/ajax/kind/Kindergarten/get/${kindergartenId}`);
 }
 
 export async function appId(payload) {
@@ -45,7 +53,10 @@ export async function login(payload) {
 // 获得匹配分期id的优惠券列表
 export async function availableBonus(payload) {
   const token = sessionStorage.getItem('payTokenId');
-  return request(`/ajax/app/promotion/coupon/queryUserCouponListByPayTypeId?${qs.stringify(payload)}`, {
-    headers: { token },
-  });
+  return request(
+    `/ajax/app/promotion/coupon/queryUserCouponListByPayTypeId?${qs.stringify(payload)}`,
+    {
+      headers: { token },
+    }
+  );
 }

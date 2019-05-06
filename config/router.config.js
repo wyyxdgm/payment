@@ -4,7 +4,7 @@ export default [
     path: '/',
     component: '../layouts/BlankLayout',
     routes: [
-      { path: '/payment', component: './Payment' },
+      { path: '/payment', name: '专属学费卡', component: './Payment' },
       { path: '/tuition', component: './Tuition' },
       { path: '/shared', component: './Shared' },
       {

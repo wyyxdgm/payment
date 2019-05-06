@@ -3,10 +3,13 @@ import { connect } from 'dva';
 import { List, InputItem, WhiteSpace, Button, Toast } from 'antd-mobile';
 import { createForm } from 'rc-form';
 import qs from 'qs';
+import isEqual from 'lodash/isEqual';
+import DocumentTitle from 'react-document-title';
 import router from 'umi/router';
 import Loading from '@/components/PageLoading';
 import InputSelect from '@/components/InputSelect';
 import { isWeChat } from '@/utils/userAgent';
+import Period from './Period';
 import { ReactComponent as Student } from '@/assets/icon/xuesheng.svg';
 import { ReactComponent as Pay } from '@/assets/icon/jiaofeiren.svg';
 import { ReactComponent as Phone } from '@/assets/icon/shouji.svg';
@@ -15,8 +18,9 @@ import styles from './style.less';
 
 @connect(({ pay, loading }) => ({
   summary: pay.summary,
-  typeId: pay.typeId,
+  periods: pay.periods,
   students: pay.students,
+  kindergartenName: pay.kindergartenName,
   submitting: loading.effects['pay/submit'],
   detailLoading: loading.effects['pay/detail'],
 }))
@@ -27,8 +31,8 @@ class Payment extends PureComponent {
 
     const payType = isWeChat() ? 7 : 6;
     // 支付方法 1 支付宝，2 微信, 5 寺库
-    this.state = { payType };
-    this.typeId = 0;
+    const { periods } = this.props;
+    this.state = { payType, period: periods ? periods[0] : {} };
   }
 
   componentWillMount() {
@@ -37,7 +41,8 @@ class Payment extends PureComponent {
       dispatch,
     } = this.props;
 
-    const { formId, classId, code, state } = query;
+    const { formId, classId, kindergartenId, code, state } = query;
+
     if ((isWeChat() && !(code && state)) || !isWeChat()) {
       // 微信未认证，或者其他客户端访问，就走这里
       if (formId) {
@@ -46,8 +51,11 @@ class Payment extends PureComponent {
       if (classId) {
         dispatch({ type: 'pay/student', payload: { classId } });
       }
+      if (kindergartenId) {
+        dispatch({ type: 'pay/kgName', payload: { kindergartenId } });
+      }
     } else if (isWeChat()) {
-      const [orderNo, typeId, kindergartenId] = state.split('|');
+      const [orderNo, typeId] = state.split('|');
       dispatch({
         type: 'pay/openId',
         payload: { code, kindergartenId },
@@ -67,13 +75,22 @@ class Payment extends PureComponent {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { periods } = this.props;
+    if (nextProps.periods.length > 0 && !isEqual(periods, nextProps.periods)) {
+      this.setState({ period: nextProps.periods[0] });
+    }
+  }
+
   validate = () => {
     const {
       location: { query },
       form: { validateFields },
       dispatch,
-      typeId,
     } = this.props;
+    const {
+      period: { id: typeId },
+    } = this.state;
 
     validateFields((error, values) => {
       if (error) {
@@ -107,6 +124,11 @@ class Payment extends PureComponent {
         },
       });
     });
+  };
+
+  // 缴费方式选择响应
+  handlePeriodChange = period => {
+    this.setState({ period });
   };
 
   // 微信授权，会使页面重定向
@@ -173,74 +195,87 @@ class Payment extends PureComponent {
     const {
       form: { getFieldProps, getFieldError },
       summary,
+      kindergartenName,
       students,
+      periods,
       submitting,
     } = this.props;
-    const { name, formContent, feeTotal, firstAmount } = summary;
+
+    const { period } = this.state;
+    const firstAmount = ((period.amount * period.scale) / 100).toFixed(2);
+    const { name } = summary;
 
     return (
-      <div className={styles.container}>
-        <dl className={styles.card}>
-          <dt>{name}</dt>
-          {formContent.map((item, index) => (
-            <dd key={index}>{item}</dd>
-          ))}
-          <dd className={styles.divide} />
-          <dd>
-            <span>学费总计</span>
-            <s>￥{feeTotal.toFixed(2)}</s>
-          </dd>
-          <dd className={styles.footer}>
-            <span>首付款金额</span>
-            <span className={styles.rate}>￥{firstAmount.toFixed(2)}</span>
-          </dd>
-        </dl>
-        <List renderHeader={() => '学生信息'}>
-          <InputSelect
-            dataSource={students}
-            placeholder="请输入学生姓名"
-            icon={<Student width="20" fill="#FFA800" />}
-            error={getFieldError('student')}
-            {...getFieldProps('student', {
-              rules: [{ required: true, message: '请输入学生姓名' }],
-            })}
-          >
-            选择学生
-          </InputSelect>
-          <InputItem
-            placeholder="请输入缴费人姓名"
-            labelNumber={2}
-            maxLength="20"
-            error={getFieldError('payName')}
-            {...getFieldProps('payName', {
-              rules: [{ required: true, message: '请输入缴费人姓名' }],
-            })}
-          >
-            <Pay width="20" fill="#FFA800" />
-          </InputItem>
-          <InputItem
-            type="phone"
-            placeholder="请输入缴费人手机号"
-            labelNumber={2}
-            error={getFieldError('payPhone')}
-            {...getFieldProps('payPhone', {
-              rules: [
-                { required: true, message: '请输入缴费人手机号' },
-                { len: 13, message: '请输入正确的手机号' },
-              ],
-            })}
-          >
-            <Phone width="20" fill="#FFA800" />
-          </InputItem>
-        </List>
-        <WhiteSpace />
+      <DocumentTitle title={kindergartenName}>
+        <div className={styles.container}>
+          <div className={styles.period}>
+            <h2>{name}</h2>
+            <Period data={periods} onChange={this.handlePeriodChange} />
+          </div>
+          <List renderHeader={() => '学生信息'}>
+            <InputSelect
+              dataSource={students}
+              placeholder="请输入学生姓名"
+              icon={<Student width="20" fill="#FFA800" />}
+              error={getFieldError('student')}
+              {...getFieldProps('student', {
+                rules: [{ required: true, message: '请输入学生姓名' }],
+              })}
+            >
+              选择学生
+            </InputSelect>
+            <InputItem
+              placeholder="请输入缴费人姓名"
+              labelNumber={2}
+              maxLength="20"
+              error={getFieldError('payName')}
+              {...getFieldProps('payName', {
+                rules: [{ required: true, message: '请输入缴费人姓名' }],
+              })}
+            >
+              <Pay width="20" fill="#FFA800" />
+            </InputItem>
+            <InputItem
+              type="phone"
+              placeholder="请输入缴费人手机号"
+              labelNumber={2}
+              error={getFieldError('payPhone')}
+              {...getFieldProps('payPhone', {
+                rules: [
+                  { required: true, message: '请输入缴费人手机号' },
+                  { len: 13, message: '请输入正确的手机号' },
+                ],
+              })}
+            >
+              <Phone width="20" fill="#FFA800" />
+            </InputItem>
+          </List>
+          <WhiteSpace size="xl" />
+          {period.type === 1 && (
+            <dl className={styles.card}>
+              <dt>首付款金额</dt>
+              <dd>
+                <span>预计账单金额</span>
+                <span>
+                  ￥{period.monthAmount} * {period.installmentNum}期
+                </span>
+              </dd>
+              <dd className={styles.footer}>
+                <span>
+                  首付款总额<small>（总金额*10%）</small>
+                </span>
+                <span className={styles.rate}>￥{firstAmount}</span>
+              </dd>
+            </dl>
+          )}
 
-        <div className={styles.btnArea}>
-          <Button onClick={() => this.validate()} loading={submitting}>
-            确认支付 <span className={styles.btnPrice}>￥{firstAmount.toFixed(2)}</span>
-          </Button>
+          <div className={styles.btnArea}>
+            <Button onClick={() => this.validate()} loading={submitting}>
+              确认支付 <span className={styles.btnPrice}>￥{firstAmount}</span>
+            </Button>
+          </div>
         </div>
-      </div>
+      </DocumentTitle>
     );
   }
 

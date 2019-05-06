@@ -367,7 +367,10 @@ class Tuition extends PureComponent {
             onInput={this.handleCodeKeyPress}
             error={getFieldError('checkCode')}
             {...getFieldProps('checkCode', {
-              rules: [{ required: true, message: '请输入验证码' }],
+              rules: [
+                { required: true, message: '请输入验证码' },
+                { len: 6, message: '请输入6位验证码' },
+              ],
             })}
           >
             <Spacer />
