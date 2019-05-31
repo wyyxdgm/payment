@@ -11,7 +11,7 @@ const stagingMap = {
   4326590452596741: ['常规月付', '按月缴费'],
 };
 
-export default class Staging extends PureComponent {
+export default class Period extends PureComponent {
   static propTypes = {
     data: PropTypes.arrayOf(
       PropTypes.shape({
@@ -38,10 +38,12 @@ export default class Staging extends PureComponent {
 
   componentDidMount() {
     const { data, onChange } = this.props;
-    const { id } = data[0];
-    this.setState({ id }, () => {
-      onChange(data[0]);
-    });
+    if (data.length > 0) {
+      const { id } = data[0];
+      this.setState({ id }, () => {
+        onChange(data[0]);
+      });
+    }
   }
 
   handleClick = item => () => {

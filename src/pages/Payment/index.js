@@ -32,7 +32,7 @@ class Payment extends PureComponent {
     const payType = isWeChat() ? 7 : 6;
     // 支付方法 1 支付宝，2 微信, 5 寺库
     const { periods } = this.props;
-    this.state = { payType, period: periods ? periods[0] : {} };
+    this.state = { payType, period: periods.length > 0 ? periods[0] : {} };
   }
 
   componentWillMount() {
@@ -162,7 +162,12 @@ class Payment extends PureComponent {
   }
 
   wakeup(data) {
-    const { dispatch } = this.props;
+    const {
+      location: { query },
+      dispatch,
+    } = this.props;
+    const { kindergartenId } = query;
+
     window.WeixinJSBridge.invoke(
       'getBrandWCPayRequest',
       {
@@ -185,7 +190,8 @@ class Payment extends PureComponent {
             router.replace('/result/pay-fail');
             break;
           case 'get_brand_wcpay_request:ok':
-            window.location.href = 'https://m.hoogoo.cn/PaySuccess';
+            // window.location.href = 'https://m.hoogoo.cn/PaySuccess';
+            window.location.href = `https://m.hoogoo.cn/ApplyMaterial?kindergartenId=${kindergartenId}`;
         }
       }
     );
@@ -202,7 +208,6 @@ class Payment extends PureComponent {
     } = this.props;
 
     const { period } = this.state;
-    const firstAmount = ((period.amount * period.scale) / 100).toFixed(2);
     const { name } = summary;
 
     return (
@@ -253,25 +258,22 @@ class Payment extends PureComponent {
           <WhiteSpace size="xl" />
           {period.type === 1 && (
             <dl className={styles.card}>
-              <dt>首付款金额</dt>
               <dd>
-                <span>预计账单金额</span>
-                <span>
+                <span>申请学费总额</span>
+                <span className={styles.rate}>
                   ￥{period.monthAmount} * {period.installmentNum}期
                 </span>
               </dd>
               <dd className={styles.footer}>
-                <span>
-                  首付款总额<small>（总金额*10%）</small>
-                </span>
-                <span className={styles.rate}>￥{firstAmount}</span>
+                <span style={{ fontSize: '14px' }}>首付款</span>
+                <span>￥{period.amount}</span>
               </dd>
             </dl>
           )}
 
           <div className={styles.btnArea}>
             <Button onClick={() => this.validate()} loading={submitting}>
-              确认支付 <span className={styles.btnPrice}>￥{firstAmount}</span>
+              确认支付 <span className={styles.btnPrice}>￥{period.amount}</span>
             </Button>
           </div>
         </div>

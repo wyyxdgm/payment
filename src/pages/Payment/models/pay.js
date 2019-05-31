@@ -85,14 +85,18 @@ export default {
       }
 
       // 把标准的首付分期和本制单的首付分期进行参数合并，这本应该是后台提供合并后的数据
-      const periods = types.map(type => {
-        const installment = installmentsData.find(item => type.installmentId === item.id);
-        return {
-          ...installment,
-          ...type,
-          type: installment.type,
-        };
-      });
+      const periods = types
+        .map(type => {
+          const installment = installmentsData.find(item => type.installmentId === item.id);
+          return installment
+            ? {
+                ...installment,
+                ...type,
+                type: installment.type,
+              }
+            : null;
+        })
+        .filter(type => !!type);
 
       return {
         ...state,
