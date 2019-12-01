@@ -90,7 +90,7 @@ class Tuition extends PureComponent {
   getAvailableBonus() {
     const { dispatch } = this.props;
     const { payType } = this.state;
-    if (payType === 5) {
+    if (payType === 5 || payType === 8) {
       dispatch({
         type: 'tuition/availableBonus',
         payload: { payTypeId: this.typeId },
@@ -130,7 +130,7 @@ class Tuition extends PureComponent {
         couponId,
       };
 
-      if (payType === 5) {
+      if (payType === 5 || payType === 8) {
         window.location.href = `https://m.hoogoo.cn/ajax/pay/pay/payment?${qs.stringify(payload)}`;
       } else {
         dispatch({
@@ -151,7 +151,7 @@ class Tuition extends PureComponent {
 
   // 缴费方式选择响应
   handleStagingChange = item => {
-    const payType = item.type === 2 ? 5 : this.defaultPayType;
+    const payType = item.type === 2 ? 8 : this.defaultPayType;
     this.typeId = item.id;
     this.setState({ payType, bonusId: -1, bonusAmount: 0 }, this.getAvailableBonus);
   };
@@ -275,8 +275,7 @@ class Tuition extends PureComponent {
   wakeup(data) {
     const { dispatch } = this.props;
     window.WeixinJSBridge.invoke(
-      'getBrandWCPayRequest',
-      {
+      'getBrandWCPayRequest', {
         appId: data.appid, // 公众号名称，由商户传入
         timeStamp: data.timeStamp, // 时间戳，自1970年以来的秒数
         nonceStr: data.nonceStr, // 随机串
