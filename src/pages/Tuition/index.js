@@ -52,7 +52,8 @@ class Tuition extends PureComponent {
       dispatch,
     } = this.props;
 
-    const { formId, classId, code, state } = query;
+    const { formId, classId, code, state, bg_url } = query;
+    if (bg_url) this.setState({ bg_url });
     if ((isWeChat() && !(code && state)) || !isWeChat()) {
       // 微信未认证，或者其他客户端访问，就走这里
       localStorage.setItem('id', query.formId);
@@ -302,7 +303,7 @@ class Tuition extends PureComponent {
   }
 
   normal() {
-    const { bonusShow, bonusId, bonusName, bonusAmount } = this.state;
+    const { bonusShow, bonusId, bonusName, bonusAmount, bg_url } = this.state;
     const {
       form: { getFieldProps, getFieldError },
       summary,
@@ -315,7 +316,7 @@ class Tuition extends PureComponent {
     const { name, gradeName } = summary;
 
     return (
-      <div className={styles.container}>
+      <div className={styles.container} style={{ backgroundImage: bg_url ? `url('${bg_url}')` : `url('../../assets/tuitionBg.png')` }}>
         <div className={styles.title}>{`${name + gradeName} - ${query.className}`}</div>
         <WhiteSpace size="lg" />
         学生信息
