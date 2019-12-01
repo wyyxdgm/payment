@@ -314,9 +314,11 @@ class Tuition extends PureComponent {
       location: { query },
     } = this.props;
     const { name, gradeName } = summary;
+    let style = {};
+    if (bg_url) style = { backgroundImage: `url('${bg_url}')` };
 
     return (
-      <div className={styles.container} style={{ backgroundImage: bg_url ? `url('${bg_url}')` : `url('../../assets/tuitionBg.png')` }}>
+      <div className={styles.container} style={{...style}}>
         <div className={styles.title}>{`${name + gradeName} - ${query.className}`}</div>
         <WhiteSpace size="lg" />
         学生信息
