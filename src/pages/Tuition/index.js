@@ -131,7 +131,7 @@ class Tuition extends PureComponent {
       };
 
       if (payType === 5 || payType === 8) {
-        window.location.href = `https://m.hoogoo.cn/ajax/pay/pay/payment?${qs.stringify(payload)}`;
+        window.location.href = `http://testm.hoogoo.cn/ajax/pay/pay/payment?${qs.stringify(payload)}`;
       } else {
         dispatch({
           type: 'tuition/submit',
